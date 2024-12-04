@@ -1,4 +1,4 @@
-.class public methodParams
+.class public For
 .super java/lang/Object
 
 .method public static main([Ljava/lang/String;)V
