@@ -2,26 +2,27 @@
 .super java/lang/Object
 
 .method public static main([Ljava/lang/String;)V
-    .limit stack 10
-    .limit locals 10
+    .limit stack 3
+    .limit locals 3
 
     ldc 5
     istore_1
 
     ldc 10
-    istore_2
+    istore 2
+    istore_1
 
     ldc 15            ; Load 15 onto the stack (c)
-    istore_3          ; Store it in local variable 3 (c)
+    istore 3          ; Store it in local variable 3 (c)
 
     ; First if statement: if (a < b)
-    iload_1           ; Load a onto the stack
-    iload_2           ; Load b onto the stack
+    iload 1           ; Load a onto the stack
+    iload 2           ; Load b onto the stack
     if_icmpge else1   ; If a >= b, jump to else1
 
     ; Nested if statement: if (b < c)
-    iload_2           ; Load b onto the stack
-    iload_3           ; Load c onto the stack
+    iload 2           ; Load b onto the stack
+    iload 3           ; Load c onto the stack
     if_icmpge else2   ; If b >= c, jump to else2
 
     ; If b < c, print "b is less than c"
