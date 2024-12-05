@@ -2,14 +2,13 @@
 .super java/lang/Object
 
 .method public static main([Ljava/lang/String;)V
-
    .limit stack 100
    .limit locals 100
 
 
    ; Llamar al método funcVacio
    invokestatic methodVacio/funcVacio()V
-   
+
    ; Terminar el main
    return
 
