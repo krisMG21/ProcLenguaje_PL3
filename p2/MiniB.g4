@@ -64,14 +64,16 @@ comparisonOp: '<' #LessThan
             | '>' #GreaterThan
             | '<=' #LessThanOrEqual
             | '>=' #GreaterThanOrEqual
-            | '=' #Equal;
+            | '=' #Equal
+            ;
 
 expression: expression op expression #BinaryExpression
             | '(' expression ')' #ParenExpression
             | functionCall #FunctionCallExpression
             | num=NUMBER #NumberExpression
             | str=STRING_LITERAL #StringExpression
-            | id=ID #IdExpression;
+            | id=ID #IdExpression
+            ;
 
 op:         '+' #Plus
             | '-' #Minus
@@ -83,6 +85,7 @@ op:         '+' #Plus
 functionCall: VAL '(' expression ')' #ValFunction
             | LEN '(' expression ')' #LenFunction
             | ISNAN '(' expression ')' #IsNanFunction
+            ;
 
 // LEXER RULES
 NOT:        'NOT' | 'not';
