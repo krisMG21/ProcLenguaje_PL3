@@ -1,4 +1,4 @@
-grammar BasicMejorado;
+grammar MiniB;
 // PARSER RULES
 program:    (statement NEWLINE+)* statement? EOF
             ;
@@ -9,15 +9,15 @@ program:    (statement NEWLINE+)* statement? EOF #Program
             ;
 */
 
-statement:  letStmt #Let
-            | opStmt #Op
-            | printStmt #Print
-            | inputStmt #Input
-            | ifStmt #If
-            | forStmt #For
-            | whileStmt #While
-            | repeatStmt #Repeat
-            | keyStmt #Key
+statement:  letStmt
+            | opStmt
+            | printStmt
+            | inputStmt
+            | ifStmt
+            | forStmt
+            | whileStmt
+            | repeatStmt
+            | keyStmt
             ;
 
 letStmt:    LET id=ID '=' exp=expression #Let
@@ -50,12 +50,6 @@ keyStmt:    CONTINUE #Continue
             | EXIT #Exit
             ;
 
-condition:  expression comparisonOp expression 
-            | NOT condition 
-            | condition logicalOp condition 
-            | expression
-            ;
-
 logicalOp:  AND #And
             | OR #Or
             ;
@@ -67,19 +61,25 @@ comparisonOp: '<' #LessThan
             | '=' #Equal
             ;
 
-expression: expression op expression #BinaryExpression
+arithmeticOp: '+' #Plus
+            | '-' #Minus
+            | '*' #Multiply
+            | '/' #Divide
+            | MOD #Modulo
+            ;
+
+condition:  expression comparisonOp expression 
+            | NOT condition 
+            | condition logicalOp condition 
+            | expression
+            ;
+
+expression: expression arithmeticOp expression #BinaryExpression
             | '(' expression ')' #ParenExpression
             | functionCall #FunctionCallExpression
             | num=NUMBER #NumberExpression
             | str=STRING_LITERAL #StringExpression
             | id=ID #IdExpression
-            ;
-
-op:         '+' #Plus
-            | '-' #Minus
-            | '*' #Multiply
-            | '/' #Divide
-            | MOD #Modulo
             ;
 
 functionCall: VAL '(' expression ')' #ValFunction
