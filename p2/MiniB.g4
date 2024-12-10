@@ -48,13 +48,19 @@ repeatStmt: REPEAT NEWLINE (statement NEWLINE)* UNTIL cond=condition #Repeat
 
 keyStmt:    CONTINUE #Continue
             | EXIT #Exit
-            | NOT condition #NotCondition
-            | left=condition logicalOp right=condition #LogicalCondition
-            | exp=expression #ExpressionCondition
+            ;
+
+condition:  expression comparisonOp expression 
+            | NOT condition 
+            | condition logicalOp condition 
+            | expression
             ;
 
 logicalOp:  AND #And
             | OR #Or
+            ;
+
+comparisonOp: '<' #LessThan
             | '>' #GreaterThan
             | '<=' #LessThanOrEqual
             | '>=' #GreaterThanOrEqual
