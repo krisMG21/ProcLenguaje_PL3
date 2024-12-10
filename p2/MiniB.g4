@@ -83,6 +83,7 @@ op:         '+' #Plus
 functionCall: VAL '(' expression ')' #ValFunction
             | LEN '(' expression ')' #LenFunction
             | ISNAN '(' expression ')' #IsNanFunction
+            ;
 
 // LEXER RULES
 NOT:        'NOT' | 'not';
