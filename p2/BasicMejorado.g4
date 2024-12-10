@@ -1,6 +1,13 @@
 grammar BasicMejorado;
 // PARSER RULES
-program: (statement NEWLINE+)* statement? EOF;
+program:    (statement NEWLINE+)* statement? EOF
+            ;
+
+/*
+program:    (statement NEWLINE+)* statement? EOF #Program
+            | EOF #EmptyProgram
+            ;
+*/
 
 statement:  letStmt #Let
             | opStmt #Op
@@ -13,37 +20,37 @@ statement:  letStmt #Let
             | keyStmt #Key
             ;
 
-letStmt:    LET ID '=' exp=expression #Let
+letStmt:    LET id=ID '=' exp=expression #Let
             ;
 
-opStmt:     ID '=' exp=expression #Op
+opStmt:     id=ID '=' exp=expression #Op
             ;
 
 printStmt:  PRINT exp=expression #Print
             ;
 
-inputStmt:  INPUT STRING_LITERAL ID #Input
+inputStmt:  INPUT str=STRING_LITERAL id=ID #Input
             ;
 
-ifStmt:     IF cond1=condition THEN NEWLINE (stat1=statement NEWLINE)*
-            (ELSE NEWLINE (stat2=statement NEWLINE)*)? END #If
+ifStmt:     IF cond=condition THEN NEWLINE (statif=statement NEWLINE)*
+            (ELSE NEWLINE (statelse=statement NEWLINE)*)? END #If
             ;
 
-forStmt:    FOR ID '=' exp1=expression TO exp2=expression NEWLINE
+forStmt:    FOR id=ID '=' exp1=expression TO exp2=expression NEWLINE
             (stat=statement NEWLINE)* NEXT #For
             ;
 
-whileStmt:  WHILE condition NEWLINE (statement NEWLINE)* END #While
+whileStmt:  WHILE cond=condition NEWLINE (statement NEWLINE)* END #While
             ;
 
-repeatStmt: REPEAT NEWLINE (statement NEWLINE)* UNTIL condition #Repeat
+repeatStmt: REPEAT NEWLINE (statement NEWLINE)* UNTIL cond=condition #Repeat
             ;
 
 keyStmt:    CONTINUE #Continue
             | EXIT #Exit
             | NOT condition #NotCondition
-            | condition logicalOp condition #LogicalCondition
-            | expression #ExpressionCondition
+            | left=condition logicalOp right=condition #LogicalCondition
+            | exp=expression #ExpressionCondition
             ;
 
 logicalOp:  AND #And
@@ -56,9 +63,9 @@ logicalOp:  AND #And
 expression: expression op expression #BinaryExpression
             | '(' expression ')' #ParenExpression
             | functionCall #FunctionCallExpression
-            | NUMBER #NumberExpression
-            | STRING_LITERAL #StringExpression
-            | ID #IdExpression;
+            | num=NUMBER #NumberExpression
+            | str=STRING_LITERAL #StringExpression
+            | id=ID #IdExpression;
 
 op:         '+' #Plus
             | '-' #Minus
