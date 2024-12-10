@@ -2,16 +2,16 @@ grammar BasicMejorado;
 // PARSER RULES
 program: (statement NEWLINE+)* statement? EOF;
 
-statement: letStmt #Let
-| opStmt #Op
-| printStmt #Print
-| inputStmt #Input
-| ifStmt #If
-| forStmt #For
-| whileStmt #While
-| repeatStmt #Repeat
-| keyStmt #Key
-;
+statement:  letStmt #Let
+            | opStmt #Op
+            | printStmt #Print
+            | inputStmt #Input
+            | ifStmt #If
+            | forStmt #For
+            | whileStmt #While
+            | repeatStmt #Repeat
+            | keyStmt #Key
+            ;
 
 letStmt:    LET ID '=' exp=expression #Let
             ;
