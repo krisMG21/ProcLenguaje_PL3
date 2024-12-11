@@ -9,7 +9,7 @@ class Visitor(ParseTreeVisitor):
         self.label_count = 0
         self.stack_limit = 100
         self.local_limit = 100
-        self.symbol_table = SymbolTable()
+        self.tabla = SymbolTable()
         self.current_var = 0
 
     def get_jasmin_code(self):
@@ -29,15 +29,6 @@ class Visitor(ParseTreeVisitor):
     def add_instruction(self, instruction):
         self.instructions.append(f"    {instruction}")
 
-    def get_variable(self, name):
-        if name not in self.symbol_table.symbols:
-            index = self.current_var
-            self.symbol_table.add(name, index)
-            self.current_var += 1
-        else:
-            index = self.symbol_table.get(name)
-        return index
-
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         for stmt in ctx.statement():
             self.visit(stmt)
@@ -46,14 +37,13 @@ class Visitor(ParseTreeVisitor):
     def visitLet(self, ctx: MiniBParser.LetContext):
         print("En let: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
-        self.visit(ctx.exp)
-        var_index = self.get_variable(var_name)
+        var_index = self.tabla.get(var_name)
         self.add_instruction(f"istore {var_index}")
 
     def visitOp(self, ctx: MiniBParser.OpContext):
         var_name = ctx.ID().getText()
         self.visit(ctx.exp)
-        var_index = self.get_variable(var_name)
+        var_index = self.tabla.get(var_name)
         self.add_instruction(f"istore {var_index}")
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
@@ -64,7 +54,7 @@ class Visitor(ParseTreeVisitor):
     def visitInput(self, ctx: MiniBParser.InputContext):
         # Simplified input: just push 0 onto the stack
         self.add_instruction("ldc 0")
-        var_index = self.get_variable(ctx.id().getText())
+        var_index = self.get_variable(ctx.ID().getText())
         self.add_instruction(f"istore {var_index}")
 
     def visitIf(self, ctx: MiniBParser.IfContext):
@@ -195,12 +185,12 @@ class Visitor(ParseTreeVisitor):
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         # Simplified: treat strings as their length
-        self.add_instruction
-            f"ldc {len(ctx.STRING_LITERAL().getText()) - 2}
+        self.add_instruction(
+            f"ldc {len(ctx.STRING_LITERAL().getText()) - 2}"
         )  # -2 for quote
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
-        var_name = ctx.id.text
+        var_name = ctx.ID().getText()
         var_index = self.get_variable(var_name)
         self.add_instruction(f"iload {var_index}")
 

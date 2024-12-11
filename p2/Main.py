@@ -1,5 +1,4 @@
 import sys
-import os
 import subprocess
 from antlr4 import InputStream, CommonTokenStream
 from antlr4.ParserRuleContext import ParseTree
@@ -59,11 +58,11 @@ def compile_source(file):
     with open(file, "r") as f:
         text = f.read()
 
-    lexer = MiniBLexer(InputStream(text))
-    tokens = CommonTokenStream(lexer)
-    parser = MiniBParser(tokens)
-    tree = parser.program()
-    visitor = Visitor()
+    lexer: MiniBLexer = MiniBLexer(InputStream(text))
+    tokens: CommonTokenStream = CommonTokenStream(lexer)
+    parser: MiniBParser = MiniBParser(tokens)
+    tree: ParseTree = parser.program()
+    visitor: Visitor = Visitor()
     return visitor.visit(tree)
 
 

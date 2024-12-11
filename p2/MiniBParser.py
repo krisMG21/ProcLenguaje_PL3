@@ -476,14 +476,13 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.OpStmtContext
             super().__init__(parser)
-            self.id_ = None # Token
             self.exp = None # ExpressionContext
             self.copyFrom(ctx)
 
-        def EQ(self):
-            return self.getToken(MiniBParser.EQ, 0)
         def ID(self):
             return self.getToken(MiniBParser.ID, 0)
+        def EQ(self):
+            return self.getToken(MiniBParser.EQ, 0)
         def expression(self):
             return self.getTypedRuleContext(MiniBParser.ExpressionContext,0)
 
@@ -504,7 +503,7 @@ class MiniBParser ( Parser ):
             localctx = MiniBParser.OpContext(self, localctx)
             self.enterOuterAlt(localctx, 1)
             self.state = 66
-            localctx.id_ = self.match(MiniBParser.ID)
+            self.match(MiniBParser.ID)
             self.state = 67
             self.match(MiniBParser.EQ)
             self.state = 68
@@ -598,15 +597,14 @@ class MiniBParser ( Parser ):
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.InputStmtContext
             super().__init__(parser)
             self.str_ = None # Token
-            self.id_ = None # Token
             self.copyFrom(ctx)
 
         def INPUT(self):
             return self.getToken(MiniBParser.INPUT, 0)
-        def STRING_LITERAL(self):
-            return self.getToken(MiniBParser.STRING_LITERAL, 0)
         def ID(self):
             return self.getToken(MiniBParser.ID, 0)
+        def STRING_LITERAL(self):
+            return self.getToken(MiniBParser.STRING_LITERAL, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitInput" ):
@@ -628,7 +626,7 @@ class MiniBParser ( Parser ):
             self.state = 74
             localctx.str_ = self.match(MiniBParser.STRING_LITERAL)
             self.state = 75
-            localctx.id_ = self.match(MiniBParser.ID)
+            self.match(MiniBParser.ID)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -777,7 +775,6 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ForStmtContext
             super().__init__(parser)
-            self.id_ = None # Token
             self.exp1 = None # ExpressionContext
             self.exp2 = None # ExpressionContext
             self.stat = None # StatementContext
@@ -785,6 +782,8 @@ class MiniBParser ( Parser ):
 
         def FOR(self):
             return self.getToken(MiniBParser.FOR, 0)
+        def ID(self):
+            return self.getToken(MiniBParser.ID, 0)
         def EQ(self):
             return self.getToken(MiniBParser.EQ, 0)
         def TO(self):
@@ -796,8 +795,6 @@ class MiniBParser ( Parser ):
                 return self.getToken(MiniBParser.NEWLINE, i)
         def NEXT(self):
             return self.getToken(MiniBParser.NEXT, 0)
-        def ID(self):
-            return self.getToken(MiniBParser.ID, 0)
         def expression(self, i:int=None):
             if i is None:
                 return self.getTypedRuleContexts(MiniBParser.ExpressionContext)
@@ -830,7 +827,7 @@ class MiniBParser ( Parser ):
             self.state = 103
             self.match(MiniBParser.FOR)
             self.state = 104
-            localctx.id_ = self.match(MiniBParser.ID)
+            self.match(MiniBParser.ID)
             self.state = 105
             self.match(MiniBParser.EQ)
             self.state = 106
