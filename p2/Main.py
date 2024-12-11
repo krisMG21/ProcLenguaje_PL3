@@ -8,16 +8,13 @@ from SymbolTable import SymbolTable
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 Main.py <file>")
-        sys.exit(1)
 
     file = sys.argv[1]
     
     try:
         output_index = sys.argv.index("-o")
-        if (output_index != -1): 
-            output += sys.argv[output_index+1]
+        output = sys.argv[output_index+1]
+
     except:
         output = "./ejemplo"
         
@@ -29,6 +26,7 @@ def main():
         f.close()
 
     with open(output, "w") as f:
+        print("Guardando archivo en: ", output)
         f.write(jasmin_text)
         f.close()
 
