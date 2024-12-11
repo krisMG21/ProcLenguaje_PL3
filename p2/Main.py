@@ -7,6 +7,7 @@ from MiniBLexer import MiniBLexer
 from MiniBParser import MiniBParser
 from Visitor import Visitor
 
+
 def main():
     if len(sys.argv) < 2:
         print("Uso: python main.py <archivo_fuente> [-o <output>] [-m <modos>]")
@@ -44,7 +45,10 @@ def main():
 def generate_visitor():
     print("Generando visitor para la gramática...")
     try:
-        subprocess.run(["antlr4", "-Dlanguage=Python3", "-no-listener", "-visitor", "MiniB.g4"], check=True)
+        subprocess.run(
+            ["antlr4", "-Dlanguage=Python3", "-no-listener", "-visitor", "MiniB.g4"],
+            check=True,
+        )
         print("Visitor generado con éxito.")
     except subprocess.CalledProcessError as e:
         print("Error al generar el visitor:", e)
