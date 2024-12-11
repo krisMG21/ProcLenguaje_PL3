@@ -231,7 +231,33 @@ class Visitor(ParseTreeVisitor):
         self.visit(ctx.expression())
 
     def visitNumberExpression(self, ctx: MiniBParser.NumberExpressionContext):
-        self.add_instruction(f"ldc {ctx.NUMBER().getText()}")
+        num_text = ctx.NUMBER().getText().lower()
+        base = 10
+        if num_text.startswith('0x'):
+            base = 16
+            num_text = num_text[2:]
+        elif num_text.startswith('0b'):
+            base = 2
+            num_text = num_text[2:]
+        elif num_text.startswith('0o'):
+            base = 8
+            num_text = num_text[2:]
+    
+        if '.' in num_text:
+            integer_part, fractional_part = num_text.split('.')
+            integer_value = int(integer_part, base) if integer_part else 0
+            fractional_value = 0.0
+            for i, digit in enumerate(fractional_part):
+                fractional_value += int(digit, base) * (base ** -(i + 1))
+            value = integer_value + fractional_value
+            self.add_instruction(f"ldc {value}")
+        else:
+            if base != 10:
+                value = int(num_text, base)
+                self.add_instruction(f"ldc {value}")
+            else:
+                value = float(num_text) if '.' in num_text else int(num_text)
+                self.add_instruction(f"ldc {value}")
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         """
