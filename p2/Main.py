@@ -3,7 +3,7 @@ from antlr4 import InputStream, CommonTokenStream
 from antlr4.ParserRuleContext import ParseTree
 from MiniBLexer import MiniBLexer
 from MiniBParser import MiniBParser
-from MyVisitor import MyVisitor
+from MyVisitor import JasminVisitor
 from SymbolTable import SymbolTable
 
 
@@ -13,10 +13,19 @@ def main():
         sys.exit(1)
 
     file = sys.argv[1]
+    output = "./"
+    try:
+        output_index = sys.argv.index("-o")
+    except:
+        if (output_index != -1): output += sys.argv[output_index+1]
+
 
     with open(file, "r") as f:
         text = f.read()
         jasmin_text = compile(text)
+        f.close()
+
+    with open(output, "w") as f:
         f.write(jasmin_text)
         f.close()
 
@@ -29,7 +38,7 @@ def compile(text: str):
     tokens: CommonTokenStream = CommonTokenStream(lexer)
     parser: MiniBParser = MiniBParser(tokens)
     tree: ParseTree = parser.program()
-    visitor: MyVisitor = MyVisitor(table)
+    visitor: JasminVisitor = JasminVisitor(table)
 
     return create_jasmin_file(visitor.visit(tree))
 
