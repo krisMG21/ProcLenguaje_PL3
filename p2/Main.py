@@ -13,14 +13,13 @@ def main():
         sys.exit(1)
 
     file = sys.argv[1]
-    
+
     try:
         output_index = sys.argv.index("-o")
-        if (output_index != -1): 
-            output += sys.argv[output_index+1]
+        if output_index != -1:
+            output += sys.argv[output_index + 1]
     except:
         output = "./"
-        
 
     with open(file, "r") as f:
         text = f.read()
