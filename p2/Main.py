@@ -16,42 +16,12 @@ def main():
 
     try:
         output_index = sys.argv.index("-o")
-        output = sys.argv[output_index + 1]
-    except ValueError:
-        output = "./ejemplo.j"
+        output = sys.argv[output_index+1]
 
-    try:
-        mode_index = sys.argv.index("-m")
-        modes = sys.argv[mode_index + 1]
-    except ValueError:
-        modes = "c"
+    except:
+        output = "./ejemplo"
+        
 
-    if "v" in modes:
-        generate_visitor()
-
-    if "c" in modes:
-        jasmin_text = compile_source(file)
-        with open(output, "w") as f:
-            print("Guardando archivo en:", output)
-            f.write(jasmin_text)
-
-        compile_to_bytecode(output)
-
-    if "e" in modes:
-        execute_program()
-
-
-def generate_visitor():
-    print("Generando visitor para la gramática...")
-    try:
-        subprocess.run(["antlr4", "-Dlanguage=Python3", "-no-listener", "-visitor", "MiniB.g4"], check=True)
-        print("Visitor generado con éxito.")
-    except subprocess.CalledProcessError as e:
-        print("Error al generar el visitor:", e)
-
-
-def compile_source(file):
-    print("Compilando fuente...")
     with open(file, "r") as f:
         text = f.read()
 

@@ -195,7 +195,9 @@ class Visitor(ParseTreeVisitor):
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         # Simplified: treat strings as their length
-        self.add_instruction(f"ldc {len(ctx.STRING_LITERAL().getText()) - 2}")  # -2 for quotes
+        self.add_instruction(
+            f"ldc {len(ctx.STRING_LITERAL().getText()) - 2}"
+        )  # -2 for quotes
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
         var_name = ctx.id.text
