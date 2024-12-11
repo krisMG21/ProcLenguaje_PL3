@@ -1,4 +1,4 @@
-// Generated from c:/Users/socra/Documents/GitHub/ProcLenguaje_PL3/p2/MiniB.g4 by ANTLR 4.13.1
+// Generated from c:/Users/ruben/Desktop/Uni/4/Lenguaje/ProcLenguaje_PL3/p2/MiniB.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -373,10 +373,9 @@ public class MiniBParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class OpContext extends OpStmtContext {
-		public Token id;
 		public ExpressionContext exp;
-		public TerminalNode EQ() { return getToken(MiniBParser.EQ, 0); }
 		public TerminalNode ID() { return getToken(MiniBParser.ID, 0); }
+		public TerminalNode EQ() { return getToken(MiniBParser.EQ, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
@@ -391,7 +390,7 @@ public class MiniBParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(66);
-			((OpContext)_localctx).id = match(ID);
+			match(ID);
 			setState(67);
 			match(EQ);
 			setState(68);
@@ -470,10 +469,9 @@ public class MiniBParser extends Parser {
 	@SuppressWarnings("CheckReturnValue")
 	public static class InputContext extends InputStmtContext {
 		public Token str;
-		public Token id;
 		public TerminalNode INPUT() { return getToken(MiniBParser.INPUT, 0); }
-		public TerminalNode STRING_LITERAL() { return getToken(MiniBParser.STRING_LITERAL, 0); }
 		public TerminalNode ID() { return getToken(MiniBParser.ID, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(MiniBParser.STRING_LITERAL, 0); }
 		public InputContext(InputStmtContext ctx) { copyFrom(ctx); }
 	}
 
@@ -489,7 +487,7 @@ public class MiniBParser extends Parser {
 			setState(74);
 			((InputContext)_localctx).str = match(STRING_LITERAL);
 			setState(75);
-			((InputContext)_localctx).id = match(ID);
+			match(ID);
 			}
 		}
 		catch (RecognitionException re) {
@@ -629,11 +627,11 @@ public class MiniBParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ForContext extends ForStmtContext {
-		public Token id;
 		public ExpressionContext exp1;
 		public ExpressionContext exp2;
 		public StatementContext stat;
 		public TerminalNode FOR() { return getToken(MiniBParser.FOR, 0); }
+		public TerminalNode ID() { return getToken(MiniBParser.ID, 0); }
 		public TerminalNode EQ() { return getToken(MiniBParser.EQ, 0); }
 		public TerminalNode TO() { return getToken(MiniBParser.TO, 0); }
 		public List<TerminalNode> NEWLINE() { return getTokens(MiniBParser.NEWLINE); }
@@ -641,7 +639,6 @@ public class MiniBParser extends Parser {
 			return getToken(MiniBParser.NEWLINE, i);
 		}
 		public TerminalNode NEXT() { return getToken(MiniBParser.NEXT, 0); }
-		public TerminalNode ID() { return getToken(MiniBParser.ID, 0); }
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
 		}
@@ -668,7 +665,7 @@ public class MiniBParser extends Parser {
 			setState(103);
 			match(FOR);
 			setState(104);
-			((ForContext)_localctx).id = match(ID);
+			match(ID);
 			setState(105);
 			match(EQ);
 			setState(106);

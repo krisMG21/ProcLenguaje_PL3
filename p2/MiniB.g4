@@ -118,7 +118,12 @@ MUL:        '*' ;
 DIV:        '/' ;
 
 ID:         [a-zA-Z_][a-zA-Z0-9_]*;
-NUMBER:     [0-9]+ ('.' [0-9]+)?;
+NUMBER:'0x' [0-9a-fA-F]+       
+            | '0b' [01]+              
+            | '0o' [0-7]+             
+            | [0-9]+ ('.' [0-9]+)?
+            ;   
+
 STRING_LITERAL: '"' (~["\r\n])* '"';
 NEWLINE:    '\r'? '\n';
 COMMENT:    'REM' ~[\r\n]* NEWLINE -> skip;
