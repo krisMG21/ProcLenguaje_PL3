@@ -1,8 +1,10 @@
 import sys
-from antlr4 import InputStream, CommonTokenStream, ParseTree
+from antlr4 import InputStream, CommonTokenStream
+from antlr4.ParserRuleContext import ParseTree
 from MiniBLexer import MiniBLexer
 from MiniBParser import MiniBParser
 from MyVisitor import MyVisitor
+from SymbolTable import SymbolTable
 
 
 def main():
@@ -20,12 +22,17 @@ def main():
 
 
 def compile(text: str):
+    # Creamos tabla de simbolos
+    table: SymbolTable = SymbolTable()
+
     lexer: MiniBLexer = MiniBLexer(InputStream(text))
     tokens: CommonTokenStream = CommonTokenStream(lexer)
     parser: MiniBParser = MiniBParser(tokens)
     tree: ParseTree = parser.program()
+    visitor: MyVisitor = MyVisitor(table)
 
-    return create_jasmin_file(new MyVisitor().visit(tree))
+    return create_jasmin_file(visitor.visit(tree))
+
 
 def create_jasmin_file(instructions):
     text = f""".class public Sumar
@@ -49,4 +56,3 @@ def create_jasmin_file(instructions):
 
 if __name__ == "__main__":
     main()
-
