@@ -3,7 +3,7 @@ from antlr4 import InputStream, CommonTokenStream
 from antlr4.ParserRuleContext import ParseTree
 from MiniBLexer import MiniBLexer
 from MiniBParser import MiniBParser
-from p2.Visitor import Visitor
+from Visitor import Visitor
 from SymbolTable import SymbolTable
 
 
@@ -19,12 +19,13 @@ def main():
         if (output_index != -1): 
             output += sys.argv[output_index+1]
     except:
-        output = "./"
+        output = "./ejemplo"
         
 
     with open(file, "r") as f:
         text = f.read()
         jasmin_text = compile(text)
+        print(jasmin_text)
         f.close()
 
     with open(output, "w") as f:
@@ -41,27 +42,9 @@ def compile(text: str):
     tree: ParseTree = parser.program()
     visitor: Visitor = Visitor()
 
-    return create_jasmin_file(visitor.visit(tree))
+    return visitor.visit(tree)
 
 
-def create_jasmin_file(instructions):
-    text = f""".class public Sumar
-.super java/lang/Object
-
-.method public static main([Ljava/lang/String;)V
-   .limit stack 100visitor: MiniBVisitor = MiniBVisitor()
-    jasmin_text = create_jasmin_file())
-    return jasmin_text
-
-   .limit locals 100
-
-   getstatic java/lang/System/out Ljava/io/PrintStream;
-{instructions}
-   invokevirtual java/io/PrintStream/println(I)V
-   return
-
-.end method"""
-    return text
 
 
 if __name__ == "__main__":

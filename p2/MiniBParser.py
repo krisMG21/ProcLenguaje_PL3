@@ -410,16 +410,15 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.LetStmtContext
             super().__init__(parser)
-            self.id_ = None # Token
             self.exp = None # ExpressionContext
             self.copyFrom(ctx)
 
         def LET(self):
             return self.getToken(MiniBParser.LET, 0)
-        def EQ(self):
-            return self.getToken(MiniBParser.EQ, 0)
         def ID(self):
             return self.getToken(MiniBParser.ID, 0)
+        def EQ(self):
+            return self.getToken(MiniBParser.EQ, 0)
         def expression(self):
             return self.getTypedRuleContext(MiniBParser.ExpressionContext,0)
 
@@ -442,7 +441,7 @@ class MiniBParser ( Parser ):
             self.state = 61
             self.match(MiniBParser.LET)
             self.state = 62
-            localctx.id_ = self.match(MiniBParser.ID)
+            self.match(MiniBParser.ID)
             self.state = 63
             self.match(MiniBParser.EQ)
             self.state = 64
@@ -887,6 +886,7 @@ class MiniBParser ( Parser ):
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.WhileStmtContext
             super().__init__(parser)
             self.cond = None # ConditionContext
+            self.stat = None # StatementContext
             self.copyFrom(ctx)
 
         def WHILE(self):
@@ -935,7 +935,7 @@ class MiniBParser ( Parser ):
             _la = self._input.LA(1)
             while (((_la) & ~0x3f) == 0 and ((1 << _la) & 17180314560) != 0):
                 self.state = 123
-                self.statement()
+                localctx.stat = self.statement()
                 self.state = 124
                 self.match(MiniBParser.NEWLINE)
                 self.state = 130
@@ -1293,19 +1293,87 @@ class MiniBParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
+
+        def getRuleIndex(self):
+            return MiniBParser.RULE_condition
+
+     
+        def copyFrom(self, ctx:ParserRuleContext):
+            super().copyFrom(ctx)
+
+
+    class NotContext(ConditionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ConditionContext
+            super().__init__(parser)
+            self.cond = None # ConditionContext
+            self.copyFrom(ctx)
+
+        def NOT(self):
+            return self.getToken(MiniBParser.NOT, 0)
+        def condition(self):
+            return self.getTypedRuleContext(MiniBParser.ConditionContext,0)
+
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNot" ):
+                return visitor.visitNot(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class CondExpContext(ConditionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ConditionContext
+            super().__init__(parser)
+            self.expr = None # ExpressionContext
+            self.copyFrom(ctx)
+
+        def expression(self):
+            return self.getTypedRuleContext(MiniBParser.ExpressionContext,0)
+
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCondExp" ):
+                return visitor.visitCondExp(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class ComparisonContext(ConditionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ConditionContext
+            super().__init__(parser)
+            self.left = None # ExpressionContext
+            self.op = None # ComparisonOpContext
+            self.right = None # ExpressionContext
+            self.copyFrom(ctx)
+
         def expression(self, i:int=None):
             if i is None:
                 return self.getTypedRuleContexts(MiniBParser.ExpressionContext)
             else:
                 return self.getTypedRuleContext(MiniBParser.ExpressionContext,i)
 
-
         def comparisonOp(self):
             return self.getTypedRuleContext(MiniBParser.ComparisonOpContext,0)
 
 
-        def NOT(self):
-            return self.getToken(MiniBParser.NOT, 0)
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitComparison" ):
+                return visitor.visitComparison(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class LogicalContext(ConditionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ConditionContext
+            super().__init__(parser)
+            self.left = None # ConditionContext
+            self.op = None # LogicalOpContext
+            self.right = None # ConditionContext
+            self.copyFrom(ctx)
 
         def condition(self, i:int=None):
             if i is None:
@@ -1313,17 +1381,13 @@ class MiniBParser ( Parser ):
             else:
                 return self.getTypedRuleContext(MiniBParser.ConditionContext,i)
 
-
         def logicalOp(self):
             return self.getTypedRuleContext(MiniBParser.LogicalOpContext,0)
 
 
-        def getRuleIndex(self):
-            return MiniBParser.RULE_condition
-
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitCondition" ):
-                return visitor.visitCondition(self)
+            if hasattr( visitor, "visitLogical" ):
+                return visitor.visitLogical(self)
             else:
                 return visitor.visitChildren(self)
 
@@ -1342,24 +1406,34 @@ class MiniBParser ( Parser ):
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,11,self._ctx)
             if la_ == 1:
+                localctx = MiniBParser.ComparisonContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
+
                 self.state = 157
-                self.expression(0)
+                localctx.left = self.expression(0)
                 self.state = 158
-                self.comparisonOp()
+                localctx.op = self.comparisonOp()
                 self.state = 159
-                self.expression(0)
+                localctx.right = self.expression(0)
                 pass
 
             elif la_ == 2:
+                localctx = MiniBParser.NotContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 161
                 self.match(MiniBParser.NOT)
                 self.state = 162
-                self.condition(3)
+                localctx.cond = self.condition(3)
                 pass
 
             elif la_ == 3:
+                localctx = MiniBParser.CondExpContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 163
-                self.expression(0)
+                localctx.expr = self.expression(0)
                 pass
 
 
@@ -1372,16 +1446,17 @@ class MiniBParser ( Parser ):
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    localctx = MiniBParser.ConditionContext(self, _parentctx, _parentState)
+                    localctx = MiniBParser.LogicalContext(self, MiniBParser.ConditionContext(self, _parentctx, _parentState))
+                    localctx.left = _prevctx
                     self.pushNewRecursionContext(localctx, _startState, self.RULE_condition)
                     self.state = 166
                     if not self.precpred(self._ctx, 2):
                         from antlr4.error.Errors import FailedPredicateException
                         raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
                     self.state = 167
-                    self.logicalOp()
+                    localctx.op = self.logicalOp()
                     self.state = 168
-                    self.condition(3) 
+                    localctx.right = self.condition(3) 
                 self.state = 174
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,12,self._ctx)
@@ -1415,7 +1490,6 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ExpressionContext
             super().__init__(parser)
-            self.str_ = None # Token
             self.copyFrom(ctx)
 
         def STRING_LITERAL(self):
@@ -1432,7 +1506,6 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ExpressionContext
             super().__init__(parser)
-            self.id_ = None # Token
             self.copyFrom(ctx)
 
         def ID(self):
@@ -1449,6 +1522,7 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ExpressionContext
             super().__init__(parser)
+            self.expr = None # ExpressionContext
             self.copyFrom(ctx)
 
         def expression(self):
@@ -1466,7 +1540,6 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ExpressionContext
             super().__init__(parser)
-            self.num = None # Token
             self.copyFrom(ctx)
 
         def NUMBER(self):
@@ -1483,6 +1556,9 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ExpressionContext
             super().__init__(parser)
+            self.left = None # ExpressionContext
+            self.op = None # ArithmeticOpContext
+            self.right = None # ExpressionContext
             self.copyFrom(ctx)
 
         def expression(self, i:int=None):
@@ -1541,7 +1617,7 @@ class MiniBParser ( Parser ):
                 self.state = 176
                 self.match(MiniBParser.T__0)
                 self.state = 177
-                self.expression(0)
+                localctx.expr = self.expression(0)
                 self.state = 178
                 self.match(MiniBParser.T__1)
                 pass
@@ -1557,21 +1633,21 @@ class MiniBParser ( Parser ):
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 181
-                localctx.num = self.match(MiniBParser.NUMBER)
+                self.match(MiniBParser.NUMBER)
                 pass
             elif token in [36]:
                 localctx = MiniBParser.StringExpressionContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 182
-                localctx.str_ = self.match(MiniBParser.STRING_LITERAL)
+                self.match(MiniBParser.STRING_LITERAL)
                 pass
             elif token in [34]:
                 localctx = MiniBParser.IdExpressionContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 183
-                localctx.id_ = self.match(MiniBParser.ID)
+                self.match(MiniBParser.ID)
                 pass
             else:
                 raise NoViableAltException(self)
@@ -1586,15 +1662,16 @@ class MiniBParser ( Parser ):
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
                     localctx = MiniBParser.ArithmeticExpressionContext(self, MiniBParser.ExpressionContext(self, _parentctx, _parentState))
+                    localctx.left = _prevctx
                     self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                     self.state = 186
                     if not self.precpred(self._ctx, 6):
                         from antlr4.error.Errors import FailedPredicateException
                         raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
                     self.state = 187
-                    self.arithmeticOp()
+                    localctx.op = self.arithmeticOp()
                     self.state = 188
-                    self.expression(7) 
+                    localctx.right = self.expression(7) 
                 self.state = 194
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,14,self._ctx)
@@ -1629,6 +1706,7 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.FunctionCallContext
             super().__init__(parser)
+            self.expr = None # ExpressionContext
             self.copyFrom(ctx)
 
         def ISNAN(self):
@@ -1648,6 +1726,7 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.FunctionCallContext
             super().__init__(parser)
+            self.expr = None # ExpressionContext
             self.copyFrom(ctx)
 
         def VAL(self):
@@ -1667,6 +1746,7 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.FunctionCallContext
             super().__init__(parser)
+            self.expr = None # ExpressionContext
             self.copyFrom(ctx)
 
         def LEN(self):
@@ -1699,7 +1779,7 @@ class MiniBParser ( Parser ):
                 self.state = 196
                 self.match(MiniBParser.T__0)
                 self.state = 197
-                self.expression(0)
+                localctx.expr = self.expression(0)
                 self.state = 198
                 self.match(MiniBParser.T__1)
                 pass
@@ -1711,7 +1791,7 @@ class MiniBParser ( Parser ):
                 self.state = 201
                 self.match(MiniBParser.T__0)
                 self.state = 202
-                self.expression(0)
+                localctx.expr = self.expression(0)
                 self.state = 203
                 self.match(MiniBParser.T__1)
                 pass
@@ -1723,7 +1803,7 @@ class MiniBParser ( Parser ):
                 self.state = 206
                 self.match(MiniBParser.T__0)
                 self.state = 207
-                self.expression(0)
+                localctx.expr = self.expression(0)
                 self.state = 208
                 self.match(MiniBParser.T__1)
                 pass
