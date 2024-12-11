@@ -90,12 +90,9 @@ class Visitor(ParseTreeVisitor):
         (lo que se encuentre en la cima del stack)
         """
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
-
+        
         value = self.visit(ctx.exp)
-        self.add_instruction(
-            f'ldc "{value}"'
-        )
-
+        
         print_type = ""
         match value:
             case int():
@@ -112,10 +109,8 @@ class Visitor(ParseTreeVisitor):
                 print_type = "Ljava/util/Map;"
             case None:
                 print_type = "V"
-
-        self.add_instruction(
-            f"invokevirtual java/io/PrintStream/println({print_type})V"
-        )
+        
+        self.add_instruction(f"invokevirtual java/io/PrintStream/println({print_type})V" )
 
     def visitInput(self, ctx: MiniBParser.InputContext):
         """
@@ -233,19 +228,34 @@ class Visitor(ParseTreeVisitor):
             self.visit(ctx.expression(0))
 
     def visitArithmeticExpression(self, ctx: MiniBParser.ArithmeticExpressionContext):
-        self.visit(ctx.expression(0))
-        self.visit(ctx.expression(1))
-        op = ctx.arithmeticOp().getText()
-        if op == "+":
-            self.add_instruction("iadd")
-        elif op == "-":
-            self.add_instruction("isub")
-        elif op == "*":
-            self.add_instruction("imul")
-        elif op == "/":
-            self.add_instruction("idiv")
-        elif op == "%":
-            self.add_instruction("irem")
+        val0 = self.visit(ctx.expression(0))
+        self.add_instruction(f"ldc {val0}")
+
+        val1= self.visit(ctx.expression(1))
+        self.add_instruction(f"ldc {val1}")
+
+        self.visit(ctx.op)
+
+        return val0 # Chapuza que he hecho para que funcionen bien los tipos del print
+        # Visit a parse tree produced by MiniBParser#PlusOperation.
+    def visitPlusOperation(self, ctx:MiniBParser.PlusOperationContext):
+        self.add_instruction("iadd")
+
+    # Visit a parse tree produced by MiniBParser#MinusOperation.
+    def visitMinusOperation(self, ctx:MiniBParser.MinusOperationContext):
+        self.add_instruction("isub")
+
+    # Visit a parse tree produced by MiniBParser#MulOperation.
+    def visitMulOperation(self, ctx:MiniBParser.MulOperationContext):
+        self.add_instruction("imul")
+
+    # Visit a parse tree produced by MiniBParser#DivOperation.
+    def visitDivOperation(self, ctx:MiniBParser.DivOperationContext):
+        self.add_instruction("idiv")
+
+    # Visit a parse tree produced by MiniBParser#ModOperation.
+    def visitModOperation(self, ctx:MiniBParser.ModOperationContext):
+        self.add_instruction("irem")
 
     def visitParenExpression(self, ctx: MiniBParser.ParenExpressionContext):
         self.visit(ctx.expression())
@@ -322,6 +332,8 @@ class Visitor(ParseTreeVisitor):
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
         # Simplified: ISNAN function always returns false (0)
         return 0
+    
+
 
 
 # Usage:

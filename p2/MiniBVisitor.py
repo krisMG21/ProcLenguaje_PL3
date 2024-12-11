@@ -79,8 +79,28 @@ class MiniBVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniBParser#arithmeticOp.
-    def visitArithmeticOp(self, ctx:MiniBParser.ArithmeticOpContext):
+    # Visit a parse tree produced by MiniBParser#PlusOperation.
+    def visitPlusOperation(self, ctx:MiniBParser.PlusOperationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniBParser#MinusOperation.
+    def visitMinusOperation(self, ctx:MiniBParser.MinusOperationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniBParser#MulOperation.
+    def visitMulOperation(self, ctx:MiniBParser.MulOperationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniBParser#DivOperation.
+    def visitDivOperation(self, ctx:MiniBParser.DivOperationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniBParser#ModOperation.
+    def visitModOperation(self, ctx:MiniBParser.ModOperationContext):
         return self.visitChildren(ctx)
 
 

@@ -56,11 +56,11 @@ comparisonOp: LT
             ;
 
 
-arithmeticOp: PLUS
-            | MINUS
-            | MUL
-            | DIV
-            | MOD
+arithmeticOp: PLUS  #PlusOperation
+            | MINUS #MinusOperation
+            | MUL   #MulOperation
+            | DIV   #DivOperation
+            | MOD   #ModOperation
             ;
 
 condition:  left=expression op=comparisonOp right=expression #Comparison
