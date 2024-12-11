@@ -3,13 +3,12 @@ from MiniBParser import MiniBParser
 from SymbolTable import SymbolTable
 
 
-class JasminVisitor(ParseTreeVisitor):
+class Visitor(ParseTreeVisitor):
     def __init__(self):
         self.instructions = []
         self.label_count = 0
         self.stack_limit = 100
         self.local_limit = 100
-        self.variables = {}
         self.symbol_table = SymbolTable()
         self.current_var = 0
 
