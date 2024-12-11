@@ -3,12 +3,6 @@ grammar MiniB;
 program:    (statement NEWLINE+)* statement? EOF
             ;
 
-/*
-program:    (statement NEWLINE+)* statement? EOF #Program
-            | EOF #EmptyProgram
-            ;
-*/
-
 statement:  letStmt
             | opStmt
             | printStmt
@@ -43,29 +37,30 @@ forStmt:    FOR id=ID '=' exp1=expression TO exp2=expression NEWLINE
 whileStmt:  WHILE cond=condition NEWLINE (statement NEWLINE)* END #While
             ;
 
-repeatStmt: REPEAT NEWLINE (statement NEWLINE)* UNTIL cond=condition #Repeat
+repeatStmt: REPEAT NEWLINE (stat=statement NEWLINE)* UNTIL cond=condition #Repeat
             ;
 
 keyStmt:    CONTINUE #Continue
             | EXIT #Exit
             ;
 
-logicalOp:  AND #And
-            | OR #Or
+logicalOp:  AND
+            | OR
             ;
 
-comparisonOp: '<' #LessThan
-            | '>' #GreaterThan
-            | '<=' #LessThanOrEqual
-            | '>=' #GreaterThanOrEqual
-            | '=' #Equal
+comparisonOp: LT
+            | GT
+            | LE
+            | GE
+            | EQ
             ;
 
-arithmeticOp: '+' #Plus
-            | '-' #Minus
-            | '*' #Multiply
-            | '/' #Divide
-            | MOD #Modulo
+
+arithmeticOp: PLUS
+            | MINUS
+            | MUL
+            | DIV
+            | MOD
             ;
 
 condition:  expression comparisonOp expression 
@@ -74,16 +69,16 @@ condition:  expression comparisonOp expression
             | expression
             ;
 
-expression: expression arithmeticOp expression #BinaryExpression
-            | '(' expression ')' #ParenExpression
-            | functionCall #FunctionCallExpression
-            | num=NUMBER #NumberExpression
-            | str=STRING_LITERAL #StringExpression
-            | id=ID #IdExpression
+expression: expression arithmeticOp expression #ArithmeticExpression
+            | '(' expression ')'    #ParenExpression
+            | fun=functionCall      #FunctionCallExpression
+            | num=NUMBER            #NumberExpression
+            | str=STRING_LITERAL    #StringExpression
+            | id=ID                 #IdExpression
             ;
 
-functionCall: VAL '(' expression ')' #ValFunction
-            | LEN '(' expression ')' #LenFunction
+functionCall: VAL '(' expression ')'   #ValFunction
+            | LEN '(' expression ')'   #LenFunction
             | ISNAN '(' expression ')' #IsNanFunction
             ;
 
@@ -110,6 +105,17 @@ MOD:        'MOD' | 'mod' | '%';
 VAL:        'VAL' | 'val' ;
 LEN:        'LEN' | 'len' ;
 ISNAN:      'ISNAN' | 'isnan' ;
+
+LT:         '<' ;
+GT:         '>' ;
+LE:         '<=' ;
+GE:         '>=' ;
+EQ:         '=' ;
+
+PLUS:       '+' ;
+MINUS:      '-' ;
+MUL:        '*' ;
+DIV:        '/' ;
 
 ID:         [a-zA-Z_][a-zA-Z0-9_]*;
 NUMBER:     [0-9]+ ('.' [0-9]+)?;
