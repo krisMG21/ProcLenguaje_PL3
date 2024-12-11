@@ -17,8 +17,8 @@ def main():
     try:
         output_index = sys.argv.index("-o")
     except:
-        if (output_index != -1): output += sys.argv[output_index+1]
-
+        if output_index != -1:
+            output += sys.argv[output_index + 1]
 
     with open(file, "r") as f:
         text = f.read()
