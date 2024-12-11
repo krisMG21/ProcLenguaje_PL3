@@ -34,7 +34,7 @@ forStmt:    FOR id=ID '=' exp1=expression TO exp2=expression NEWLINE
             (stat=statement NEWLINE)* NEXT #For
             ;
 
-whileStmt:  WHILE cond=condition NEWLINE (statement NEWLINE)* END #While
+whileStmt:  WHILE cond=condition NEWLINE (stat=statement NEWLINE)* END #While
             ;
 
 repeatStmt: REPEAT NEWLINE (stat=statement NEWLINE)* UNTIL cond=condition #Repeat
@@ -63,23 +63,23 @@ arithmeticOp: PLUS
             | MOD
             ;
 
-condition:  expression comparisonOp expression #Comparison
-            | NOT condition #Not
-            | condition logicalOp condition #Logical
-            | expression
+condition:  left=expression op=comparisonOp right=expression #Comparison
+            | NOT cond=condition #Not
+            | left=condition op=logicalOp right=condition #Logical
+            | expr=expression
             ;
 
-expression: expression arithmeticOp expression #ArithmeticExpression
-            | '(' expression ')'    #ParenExpression
+expression: left=expression op=arithmeticOp right=expression #ArithmeticExpression
+            | '(' expr=expression ')'    #ParenExpression
             | fun=functionCall      #FunctionCallExpression
             | NUMBER            #NumberExpression
             | STRING_LITERAL    #StringExpression
             | ID                 #IdExpression
             ;
 
-functionCall: VAL '(' expression ')'   #ValFunction
-            | LEN '(' expression ')'   #LenFunction
-            | ISNAN '(' expression ')' #IsNanFunction
+functionCall: VAL '(' expr=expression ')'   #ValFunction
+            | LEN '(' expr=expression ')'   #LenFunction
+            | ISNAN '(' expr=expression ')' #IsNanFunction
             ;
 
 // LEXER RULES
