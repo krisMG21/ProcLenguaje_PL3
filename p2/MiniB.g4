@@ -66,7 +66,7 @@ arithmeticOp: PLUS
 condition:  left=expression op=comparisonOp right=expression #Comparison
             | NOT cond=condition #Not
             | left=condition op=logicalOp right=condition #Logical
-            | expr=expression
+            | expr=expression #condExp
             ;
 
 expression: left=expression op=arithmeticOp right=expression #ArithmeticExpression
