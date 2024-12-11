@@ -3,7 +3,7 @@ from antlr4 import InputStream, CommonTokenStream
 from antlr4.ParserRuleContext import ParseTree
 from MiniBLexer import MiniBLexer
 from MiniBParser import MiniBParser
-from MyVisitor import Visitor
+from p2.Visitor import Visitor
 from SymbolTable import SymbolTable
 
 

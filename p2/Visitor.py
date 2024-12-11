@@ -44,7 +44,8 @@ class Visitor(ParseTreeVisitor):
         return self.get_jasmin_code()
 
     def visitLet(self, ctx: MiniBParser.LetContext):
-        var_name = ctx.id.text
+        print("En let: ", ctx.ID().getText())
+        var_name = ctx.ID().getText()
         self.visit(ctx.exp)
         var_index = self.get_variable(var_name)
         self.add_instruction(f"istore {var_index}")
@@ -190,11 +191,11 @@ class Visitor(ParseTreeVisitor):
         self.visit(ctx.expression())
 
     def visitNumberExpression(self, ctx: MiniBParser.NumberExpressionContext):
-        self.add_instruction(f"ldc {ctx.num.text}")
+        self.add_instruction(f"ldc {ctx.NUMBER().getText()}")
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         # Simplified: treat strings as their length
-        self.add_instruction(f"ldc {len(ctx.str.text) - 2}")  # -2 for quotes
+        self.add_instruction(f"ldc {len(ctx.STRING_LITERAL().getText()) - 2}")  # -2 for quotes
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
         var_name = ctx.id.text

@@ -14,7 +14,7 @@ statement:  letStmt
             | keyStmt
             ;
 
-letStmt:    LET id=ID '=' exp=expression #Let
+letStmt:    LET ID '=' exp=expression #Let
             ;
 
 opStmt:     id=ID '=' exp=expression #Op
@@ -72,9 +72,9 @@ condition:  expression comparisonOp expression #Comparison
 expression: expression arithmeticOp expression #ArithmeticExpression
             | '(' expression ')'    #ParenExpression
             | fun=functionCall      #FunctionCallExpression
-            | num=NUMBER            #NumberExpression
-            | str=STRING_LITERAL    #StringExpression
-            | id=ID                 #IdExpression
+            | NUMBER            #NumberExpression
+            | STRING_LITERAL    #StringExpression
+            | ID                 #IdExpression
             ;
 
 functionCall: VAL '(' expression ')'   #ValFunction
