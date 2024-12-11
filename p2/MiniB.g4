@@ -63,9 +63,9 @@ arithmeticOp: PLUS
             | MOD
             ;
 
-condition:  expression comparisonOp expression 
-            | NOT condition 
-            | condition logicalOp condition 
+condition:  expression comparisonOp expression #Comparison
+            | NOT condition #Not
+            | condition logicalOp condition #Logical
             | expression
             ;
 
