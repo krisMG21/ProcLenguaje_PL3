@@ -4,11 +4,10 @@
 .method public static main([Ljava/lang/String;)V
     .limit stack 100
     .limit locals 100
-    ldc 3
+    ldc "Name: "
     istore 0
-    ldc 123
-    istore 1
-    ldc 12
-    istore 2
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    iload 0
+    invokevirtual java/io/PrintStream/println(V)V
     return
 .end method

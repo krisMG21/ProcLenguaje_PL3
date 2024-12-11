@@ -1,3 +1,4 @@
+import sys
 from antlr4 import ParseTreeVisitor
 from MiniBParser import MiniBParser
 from SymbolTable import SymbolTable
@@ -27,34 +28,83 @@ class Visitor(ParseTreeVisitor):
         return header + "\n".join(self.instructions) + footer
 
     def add_instruction(self, instruction):
+        """
+        Agrega una instrucción a la lista de instrucciones.
+        Estas se agregan al archivo final entre header y footer.
+        """
         self.instructions.append(f"    {instruction}")
 
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
+        """
+        Regla raíz, simplemente visita cada instrucción (teoricamente)
+        (Probar)
+        """
         for stmt in ctx.statement():
             self.visit(stmt)
         return self.get_jasmin_code()
 
     def visitLet(self, ctx: MiniBParser.LetContext):
-        print("En let: ", ctx.ID().getText())
+        """
+        Declara una variable, le asigna un valor, y la almacena
+        en la siguiente posición de locals.
+
+        Guardamos dicha posición en la tabla de simbolos.
+        """
+        # print("En let: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
-        var_index = self.tabla.get(var_name)
+        var_index = self.tabla.add(var_name)
+        self.visit(ctx.exp)
         self.add_instruction(f"istore {var_index}")
 
     def visitOp(self, ctx: MiniBParser.OpContext):
+        """
+        Asigna un valor a una variable, y la almacena
+        en su posición de locals.
+        """
+        # print("En op: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
-        self.visit(ctx.exp)
         var_index = self.tabla.get(var_name)
+        self.visit(ctx.exp)
         self.add_instruction(f"istore {var_index}")
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
+        """
+        Imprime resultado de una expresión
+        (lo que se encuentre en la cima del stack)
+        """
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
-        self.visit(ctx.exp)
-        self.add_instruction("invokevirtual java/io/PrintStream/println(I)V")
+
+        value = self.visit(ctx.exp)
+        print_type = ""
+
+        match value:
+            case int():
+                print_type = "I"
+            case str():
+                print_type = "Ljava/lang/String;"
+            case bool():
+                print_type = "Z"
+            case float():
+                print_type = "F"
+            case list():
+                print_type = "Ljava/util/List;"
+            case dict():
+                print_type = "Ljava/util/Map;"
+            case None:
+                print_type = "V"
+
+        self.add_instruction(
+            f"invokevirtual java/io/PrintStream/println({print_type})V"
+        )
 
     def visitInput(self, ctx: MiniBParser.InputContext):
-        # Simplified input: just push 0 onto the stack
-        self.add_instruction("ldc 0")
-        var_index = self.get_variable(ctx.ID().getText())
+        """
+        Alamcena una string en una variable
+        """
+        string = ctx.STRING_LITERAL().getText()
+        var_name = ctx.ID().getText()
+        var_index = self.tabla.add(var_name)
+        self.add_instruction(f"ldc {string}")
         self.add_instruction(f"istore {var_index}")
 
     def visitIf(self, ctx: MiniBParser.IfContext):
@@ -78,7 +128,7 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"{end_label}:")
 
     def visitFor(self, ctx: MiniBParser.ForContext):
-        var_index = self.get_variable(ctx.id().getText())
+        var_index = self.tabla.get(ctx.ID().getText())
         start_label = f"FOR_START_{self.label_count}"
         end_label = f"FOR_END_{self.label_count}"
         self.label_count += 1
@@ -184,15 +234,19 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"ldc {ctx.NUMBER().getText()}")
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
-        # Simplified: treat strings as their length
-        self.add_instruction(
-            f"ldc {len(ctx.STRING_LITERAL().getText()) - 2}"
-        )  # -2 for quote
+        """
+        Carga una cadena en la cima del stack.
+        """
+        self.add_instruction(f"ldc {ctx.STRING_LITERAL().getText()}")
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
+        """
+        Carga el valor de la variable en la cima del stack.
+        """
         var_name = ctx.ID().getText()
-        var_index = self.get_variable(var_name)
+        var_index = self.tabla.get(var_name)
         self.add_instruction(f"iload {var_index}")
+        return
 
     def visitFunctionCallExpression(
         self, ctx: MiniBParser.FunctionCallExpressionContext
@@ -204,8 +258,14 @@ class Visitor(ParseTreeVisitor):
         # VAL function is treated as identity function in this simplified version
 
     def visitLenFunction(self, ctx: MiniBParser.LenFunctionContext):
-        # Simplified: LEN function returns 1 for all inputs
-        self.add_instruction("ldc 1")
+        """
+        Calcula la longitud de un valor dado
+        """
+        value = self.visit(ctx.expression())
+
+        # Get length of the value
+        self.add_instruction("invokestatic java/lang/String.length()I")
+        return len(value)
 
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
         # Simplified: ISNAN function always returns false (0)
