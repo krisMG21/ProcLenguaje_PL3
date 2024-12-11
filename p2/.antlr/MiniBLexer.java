@@ -1,4 +1,4 @@
-// Generated from c:/Users/socra/Documents/GitHub/ProcLenguaje_PL3/p2/MiniB.g4 by ANTLR 4.13.1
+// Generated from c:/Users/crist/Documents/Universidad/3/ProcLenguaje/PL3/p2/MiniB.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

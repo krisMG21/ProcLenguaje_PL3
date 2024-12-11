@@ -1,4 +1,4 @@
-from antlr4 import *
+from antlr4 import ParseTreeVisitor
 from MiniBParser import MiniBParser
 from SymbolTable import SymbolTable
 
@@ -51,7 +51,7 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"istore {var_index}")
 
     def visitOp(self, ctx: MiniBParser.OpContext):
-        var_name = ctx.id.text
+        var_name = ctx.ID().getText()
         self.visit(ctx.exp)
         var_index = self.get_variable(var_name)
         self.add_instruction(f"istore {var_index}")
@@ -64,7 +64,7 @@ class Visitor(ParseTreeVisitor):
     def visitInput(self, ctx: MiniBParser.InputContext):
         # Simplified input: just push 0 onto the stack
         self.add_instruction("ldc 0")
-        var_index = self.get_variable(ctx.id.text)
+        var_index = self.get_variable(ctx.id().getText())
         self.add_instruction(f"istore {var_index}")
 
     def visitIf(self, ctx: MiniBParser.IfContext):
@@ -75,20 +75,20 @@ class Visitor(ParseTreeVisitor):
         self.visit(ctx.cond)
         self.add_instruction(f"ifeq {else_label}")
 
-        for stmt in ctx.statif:
+        for stmt in ctx.statif():
             self.visit(stmt)
 
         self.add_instruction(f"goto {end_label}")
         self.add_instruction(f"{else_label}:")
 
         if ctx.statelse:
-            for stmt in ctx.statelse:
+            for stmt in ctx.statelse():
                 self.visit(stmt)
 
         self.add_instruction(f"{end_label}:")
 
     def visitFor(self, ctx: MiniBParser.ForContext):
-        var_index = self.get_variable(ctx.id.text)
+        var_index = self.get_variable(ctx.id().getText())
         start_label = f"FOR_START_{self.label_count}"
         end_label = f"FOR_END_{self.label_count}"
         self.label_count += 1
@@ -101,7 +101,7 @@ class Visitor(ParseTreeVisitor):
         self.visit(ctx.exp2)
         self.add_instruction(f"if_icmpgt {end_label}")
 
-        for stmt in ctx.stat:
+        for stmt in ctx.stat():
             self.visit(stmt)
 
         self.add_instruction(f"iinc {var_index} 1")
@@ -129,7 +129,7 @@ class Visitor(ParseTreeVisitor):
 
         self.add_instruction(f"{start_label}:")
 
-        for stmt in ctx.stat:
+        for stmt in ctx.stat():
             self.visit(stmt)
 
         self.visit(ctx.cond)
@@ -195,9 +195,9 @@ class Visitor(ParseTreeVisitor):
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         # Simplified: treat strings as their length
-        self.add_instruction(
-            f"ldc {len(ctx.STRING_LITERAL().getText()) - 2}"
-        )  # -2 for quotes
+        self.add_instruction
+            f"ldc {len(ctx.STRING_LITERAL().getText()) - 2}
+        )  # -2 for quote
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
         var_name = ctx.id.text

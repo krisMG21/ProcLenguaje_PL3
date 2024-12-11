@@ -17,20 +17,20 @@ statement:  letStmt
 letStmt:    LET ID '=' exp=expression #Let
             ;
 
-opStmt:     id=ID '=' exp=expression #Op
+opStmt:     ID '=' exp=expression #Op
             ;
 
 printStmt:  PRINT exp=expression #Print
             ;
 
-inputStmt:  INPUT str=STRING_LITERAL id=ID #Input
+inputStmt:  INPUT str=STRING_LITERAL ID #Input
             ;
 
 ifStmt:     IF cond=condition THEN NEWLINE (statif=statement NEWLINE)*
             (ELSE NEWLINE (statelse=statement NEWLINE)*)? END #If
             ;
 
-forStmt:    FOR id=ID '=' exp1=expression TO exp2=expression NEWLINE
+forStmt:    FOR ID '=' exp1=expression TO exp2=expression NEWLINE
             (stat=statement NEWLINE)* NEXT #For
             ;
 
