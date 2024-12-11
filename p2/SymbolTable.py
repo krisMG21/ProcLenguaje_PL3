@@ -11,7 +11,7 @@ class SymbolTable:
         Crea una nueva tabla de simbolos vacía.
         """
         self.symbols = {}
-        self.var_count = 0
+        self.var_count = -1
 
     def add(self, name: str, value):
         """
@@ -23,7 +23,7 @@ class SymbolTable:
         else:
             self.symbols[name] = (self.var_count, value)
             self.var_count += 1
-        return self.symbols[name]
+        return self.var_count
 
     def get(self, name: str):
         """

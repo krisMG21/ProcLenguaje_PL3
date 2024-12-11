@@ -1,4 +1,4 @@
-// Generated from c:/Users/ruben/Desktop/Uni/4/Lenguaje/ProcLenguaje_PL3/p2/MiniB.g4 by ANTLR 4.13.1
+// Generated from c:/Users/socra/Documents/GitHub/ProcLenguaje_PL3/p2/MiniB.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;

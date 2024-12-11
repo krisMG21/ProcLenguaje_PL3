@@ -50,11 +50,28 @@ class Visitor(ParseTreeVisitor):
 
         Guardamos dicha posición en la tabla de simbolos.
         """
-        # print("En let: ", ctx.ID().getText())
+        print("En let: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
-        var_index = self.tabla.add(var_name)
-        self.visit(ctx.exp)
-        self.add_instruction(f"istore {var_index}")
+        var_value = self.visit(ctx.exp)
+        
+        print("Valor: ", var_value)
+        var_index = self.tabla.add(var_name, var_value)
+
+        match var_value:
+            case int():
+                self.add_instruction(f"ldc {var_value}")
+                self.add_instruction(f"istore_{var_index}")
+            case str():
+                self.add_instruction(f'ldc "{var_value}"')
+                self.add_instruction(f"astore_{var_index}")
+            case bool():
+                self.add_instruction(f'ldc "{var_value}"')
+                self.add_instruction(f"istore_{var_index}")
+            case float():
+                self.add_instruction(f'ldc "{var_value}"')
+                self.add_instruction(f"fstore_{var_index}")
+            
+
 
     def visitOp(self, ctx: MiniBParser.OpContext):
         """
@@ -75,8 +92,11 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
 
         value = self.visit(ctx.exp)
-        print_type = ""
+        self.add_instruction(
+            f'ldc "{value}"'
+        )
 
+        print_type = ""
         match value:
             case int():
                 print_type = "I"
@@ -103,7 +123,7 @@ class Visitor(ParseTreeVisitor):
         """
         string = ctx.STRING_LITERAL().getText()
         var_name = ctx.ID().getText()
-        var_index = self.tabla.add(var_name)
+        var_index = self.tabla.add(var_name, None)
         self.add_instruction(f"ldc {string}")
         self.add_instruction(f"istore {var_index}")
 
@@ -250,37 +270,43 @@ class Visitor(ParseTreeVisitor):
             for i, digit in enumerate(fractional_part):
                 fractional_value += int(digit, base) * (base ** -(i + 1))
             value = integer_value + fractional_value
-            self.add_instruction(f"ldc {value}")
+            return value
         else:
             if base != 10:
                 value = int(num_text, base)
-                self.add_instruction(f"ldc {value}")
+                return value
             else:
                 value = float(num_text) if '.' in num_text else int(num_text)
-                self.add_instruction(f"ldc {value}")
+                return value
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         """
         Carga una cadena en la cima del stack.
         """
-        self.add_instruction(f"ldc {ctx.STRING_LITERAL().getText()}")
+        value = f"{ctx.STRING_LITERAL().getText()[1:-1]}"
+        return value #Borrar las comillas de " "
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
         """
         Carga el valor de la variable en la cima del stack.
         """
-        var_name = ctx.ID().getText()
-        var_index = self.tabla.get(var_name)
-        self.add_instruction(f"iload {var_index}")
-        return
+        value = ctx.ID().getText()
+        
+        return value
 
     def visitFunctionCallExpression(
         self, ctx: MiniBParser.FunctionCallExpressionContext
     ):
-        self.visit(ctx.fun)
+        return self.visit(ctx.fun)
 
     def visitValFunction(self, ctx: MiniBParser.ValFunctionContext):
-        self.visit(ctx.expression())
+        value = self.visit(ctx.expression())
+        try:
+            value = int(value)
+        except:
+            value = None
+            print("En VAL() no se ha podido convertir el valor")
+        return value
         # VAL function is treated as identity function in this simplified version
 
     def visitLenFunction(self, ctx: MiniBParser.LenFunctionContext):
@@ -295,7 +321,7 @@ class Visitor(ParseTreeVisitor):
 
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
         # Simplified: ISNAN function always returns false (0)
-        self.add_instruction("ldc 0")
+        return 0
 
 
 # Usage:
