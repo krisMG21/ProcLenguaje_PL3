@@ -8,10 +8,11 @@ class Visitor(ParseTreeVisitor):
     def __init__(self):
         self.instructions = []
         self.label_count = 0
+        self.current_var = 0
         self.stack_limit = 100
         self.local_limit = 100
         self.tabla = SymbolTable()
-        self.current_var = 0
+
 
     def get_jasmin_code(self):
         header = f""".class public MiniB
@@ -27,6 +28,7 @@ class Visitor(ParseTreeVisitor):
 """
         return header + "\n".join(self.instructions) + footer
 
+
     def add_instruction(self, instruction):
         """
         Agrega una instrucción a la lista de instrucciones.
@@ -34,28 +36,12 @@ class Visitor(ParseTreeVisitor):
         """
         self.instructions.append(f"    {instruction}")
 
-    def visitProgram(self, ctx: MiniBParser.ProgramContext):
-        """
-        Regla raíz, simplemente visita cada instrucción (teoricamente)
-        (Probar)
-        """
-        for stmt in ctx.statement():
-            self.visit(stmt)
-        return self.get_jasmin_code()
 
-    def visitLet(self, ctx: MiniBParser.LetContext):
+    def assign(self, var_index, var_value):
         """
-        Declara una variable, le asigna un valor, y la almacena
-        en la siguiente posición de locals.
-
-        Guardamos dicha posición en la tabla de simbolos.
+        Asigna un valor a una variable, y la almacena
+        en su posición de locals.
         """
-        print("En let: ", ctx.ID().getText())
-        var_name = ctx.ID().getText()
-        var_value = self.visit(ctx.exp)
-        
-        print("Valor: ", var_value)
-        var_index = self.tabla.add(var_name, var_value)
 
         match var_value:
             case int():
@@ -70,7 +56,33 @@ class Visitor(ParseTreeVisitor):
             case float():
                 self.add_instruction(f'ldc "{var_value}"')
                 self.add_instruction(f"fstore_{var_index}")
-            
+
+
+    def visitProgram(self, ctx: MiniBParser.ProgramContext):
+        """
+        Regla raíz, simplemente visita cada instrucción (teoricamente)
+        (Probar)
+        """
+        for stmt in ctx.statement():
+            self.visit(stmt)
+        return self.get_jasmin_code()
+
+
+    def visitLet(self, ctx: MiniBParser.LetContext):
+        """
+        Declara una variable, le asigna un valor, y la almacena
+        en la siguiente posición de locals.
+
+        Guardamos dicha posición en la tabla de simbolos.
+        """
+        #print("En let: ", ctx.ID().getText())
+        var_name = ctx.ID().getText()
+        var_value = self.visit(ctx.exp)
+
+        #print("Valor: ", var_value)
+        var_index = self.tabla.add(var_name, var_value)
+
+        self.assign(var_index, var_value)
 
 
     def visitOp(self, ctx: MiniBParser.OpContext):
@@ -81,8 +93,10 @@ class Visitor(ParseTreeVisitor):
         # print("En op: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
         var_index = self.tabla.get(var_name)
-        self.visit(ctx.exp)
-        self.add_instruction(f"istore {var_index}")
+        var_value = self.visit(ctx.exp)
+
+        self.assign(var_index, var_value)
+
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
         """
@@ -90,9 +104,9 @@ class Visitor(ParseTreeVisitor):
         (lo que se encuentre en la cima del stack)
         """
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
-        
+
         value = self.visit(ctx.exp)
-        
+
         print_type = ""
         match value:
             case int():
@@ -109,18 +123,37 @@ class Visitor(ParseTreeVisitor):
                 print_type = "Ljava/util/Map;"
             case None:
                 print_type = "V"
-        
-        self.add_instruction(f"invokevirtual java/io/PrintStream/println({print_type})V" )
+
+        self.add_instruction(
+            f"invokevirtual java/io/PrintStream/println({print_type})V"
+        )
 
     def visitInput(self, ctx: MiniBParser.InputContext):
         """
-        Alamcena una string en una variable
+        Prints a prompt string, waits for user input, and stores the input in a variable
         """
-        string = ctx.STRING_LITERAL().getText()
+
+        prompt = ctx.STRING_LITERAL().getText()[1:-1]  # Remove surrounding quotes
         var_name = ctx.ID().getText()
         var_index = self.tabla.add(var_name, None)
-        self.add_instruction(f"ldc {string}")
-        self.add_instruction(f"istore {var_index}")
+
+        # Print the prompt
+        self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
+        self.add_instruction(f'ldc "{prompt}"')
+        self.add_instruction("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V")
+
+        # Create a Scanner object for reading input
+        self.add_instruction("new java/util/Scanner")
+        self.add_instruction("dup")
+        self.add_instruction("getstatic java/lang/System/in Ljava/io/InputStream;")
+        self.add_instruction(
+        "invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V"
+        )
+
+        # Read a line of input
+        self.add_instruction("invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;")
+        # Store the input in the variable
+        self.add_instruction(f"astore_{var_index}")
 
     def visitIf(self, ctx: MiniBParser.IfContext):
         else_label = f"ELSE_{self.label_count}"
@@ -231,30 +264,31 @@ class Visitor(ParseTreeVisitor):
         val0 = self.visit(ctx.expression(0))
         self.add_instruction(f"ldc {val0}")
 
-        val1= self.visit(ctx.expression(1))
+        val1 = self.visit(ctx.expression(1))
         self.add_instruction(f"ldc {val1}")
 
         self.visit(ctx.op)
 
-        return val0 # Chapuza que he hecho para que funcionen bien los tipos del print
+        return val0  # Chapuza que he hecho para que funcionen bien los tipos del print
         # Visit a parse tree produced by MiniBParser#PlusOperation.
-    def visitPlusOperation(self, ctx:MiniBParser.PlusOperationContext):
+
+    def visitPlusOperation(self, ctx: MiniBParser.PlusOperationContext):
         self.add_instruction("iadd")
 
     # Visit a parse tree produced by MiniBParser#MinusOperation.
-    def visitMinusOperation(self, ctx:MiniBParser.MinusOperationContext):
+    def visitMinusOperation(self, ctx: MiniBParser.MinusOperationContext):
         self.add_instruction("isub")
 
     # Visit a parse tree produced by MiniBParser#MulOperation.
-    def visitMulOperation(self, ctx:MiniBParser.MulOperationContext):
+    def visitMulOperation(self, ctx: MiniBParser.MulOperationContext):
         self.add_instruction("imul")
 
     # Visit a parse tree produced by MiniBParser#DivOperation.
-    def visitDivOperation(self, ctx:MiniBParser.DivOperationContext):
+    def visitDivOperation(self, ctx: MiniBParser.DivOperationContext):
         self.add_instruction("idiv")
 
     # Visit a parse tree produced by MiniBParser#ModOperation.
-    def visitModOperation(self, ctx:MiniBParser.ModOperationContext):
+    def visitModOperation(self, ctx: MiniBParser.ModOperationContext):
         self.add_instruction("irem")
 
     def visitParenExpression(self, ctx: MiniBParser.ParenExpressionContext):
@@ -263,18 +297,18 @@ class Visitor(ParseTreeVisitor):
     def visitNumberExpression(self, ctx: MiniBParser.NumberExpressionContext):
         num_text = ctx.NUMBER().getText().lower()
         base = 10
-        if num_text.startswith('0x'):
+        if num_text.startswith("0x"):
             base = 16
             num_text = num_text[2:]
-        elif num_text.startswith('0b'):
+        elif num_text.startswith("0b"):
             base = 2
             num_text = num_text[2:]
-        elif num_text.startswith('0o'):
+        elif num_text.startswith("0o"):
             base = 8
             num_text = num_text[2:]
-    
-        if '.' in num_text:
-            integer_part, fractional_part = num_text.split('.')
+
+        if "." in num_text:
+            integer_part, fractional_part = num_text.split(".")
             integer_value = int(integer_part, base) if integer_part else 0
             fractional_value = 0.0
             for i, digit in enumerate(fractional_part):
@@ -286,7 +320,7 @@ class Visitor(ParseTreeVisitor):
                 value = int(num_text, base)
                 return value
             else:
-                value = float(num_text) if '.' in num_text else int(num_text)
+                value = float(num_text) if "." in num_text else int(num_text)
                 return value
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
@@ -294,14 +328,14 @@ class Visitor(ParseTreeVisitor):
         Carga una cadena en la cima del stack.
         """
         value = f"{ctx.STRING_LITERAL().getText()[1:-1]}"
-        return value #Borrar las comillas de " "
+        return value  # Borrar las comillas de " "
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
         """
         Carga el valor de la variable en la cima del stack.
         """
         value = ctx.ID().getText()
-        
+
         return value
 
     def visitFunctionCallExpression(
@@ -332,15 +366,3 @@ class Visitor(ParseTreeVisitor):
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
         # Simplified: ISNAN function always returns false (0)
         return 0
-    
-
-
-
-# Usage:
-# lexer = MiniBLexer(input_stream)
-# token_stream = CommonTokenStream(lexer)
-# parser = MiniBParser(token_stream)
-# tree = parser.program()
-# visitor = JasminVisitor()
-# jasmin_code = visitor.visit(tree)
-# print(jasmin_code)
