@@ -1,1 +1,1 @@
-PRINT "Hello world!"
+PRINT 1/1
