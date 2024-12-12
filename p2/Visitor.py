@@ -7,12 +7,20 @@ from SymbolTable import SymbolTable
 class Visitor(ParseTreeVisitor):
     def __init__(self):
         self.imports = []
+        self.functions = []
         self.instructions = []
-        self.instructions = []
+
         self.label_count = 0
         self.current_var = 0
+
+        # Ambas etiquetas del bucle o control de flujo actual
+        # para que sean accesibles a CONTINUE y EXIT
+        self.start_label = ""
+        self.end_label = ""
+
         self.stack_limit = 100
         self.local_limit = 100
+
         self.tabla = SymbolTable()
 
     def get_jasmin_code(self):
@@ -195,6 +203,9 @@ class Visitor(ParseTreeVisitor):
         # Crea las labels
         else_label = f"ELSE_{self.label_count}"
         end_label = f"ENDIF_{self.label_count}"
+
+        self.start_label = else_label
+        self.end_label = end_label
         self.label_count += 1
 
         cond = self.visit(ctx.cond)
@@ -271,11 +282,10 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"ifeq {start_label}")
 
     def visitContinue(self, ctx: MiniBParser.ContinueContext):
-        # This is a simplified version, actual implementation depends on loop context
-        return "CONTINUE"
+        self.add_instruction(f"goto {self.start_label}")
 
     def visitExit(self, ctx: MiniBParser.ExitContext):
-        return "EXIT"
+        self.add_instruction(f"goto {self.end_label}")
 
     def visitComparison(self, ctx: MiniBParser.ComparisonContext):
         print("En comparison")
