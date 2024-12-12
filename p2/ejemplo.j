@@ -14,7 +14,7 @@
     invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;
     astore_0
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "name"
+    aload_0
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
     return
 .end method

@@ -11,7 +11,7 @@ class SymbolTable:
         Crea una nueva tabla de simbolos vacía.
         """
         self.symbols = {}
-        self.var_count = -1
+        self.var_count = 0
 
     def add(self, name: str, value):  # -> int, any
         """
@@ -23,7 +23,7 @@ class SymbolTable:
         else:
             self.symbols[name] = (self.var_count, value)
             self.var_count += 1
-        return self.var_count
+        return self.var_count - 1
 
     def get(self, name: str):  # -> int, any
         """
@@ -50,3 +50,9 @@ class SymbolTable:
             sys.exit(f"ERROR: Variable {name} no declarada.")
             # Sale del programa
         self.symbols[name] = (self.symbols[name][0], value)
+
+    def __str__(self):
+        """
+        Devuelve una representación de la tabla de simbolos.
+        """
+        return str(self.symbols)

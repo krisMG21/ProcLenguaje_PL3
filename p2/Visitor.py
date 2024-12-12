@@ -54,6 +54,18 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f'ldc "{var_value}"')
                 self.add_instruction(f"fstore_{var_index}")
 
+    def load_var(self, var_index: int, var_value):
+        """
+        Carga una variable en la pila.
+        """
+        match var_value:
+            case str():
+                self.add_instruction(f"aload_{var_index}")
+            case int() | bool():
+                self.add_instruction(f"iload_{var_index}")
+            case float():
+                self.add_instruction(f"fload_{var_index}")
+
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         """
         Regla raíz, simplemente visita cada instrucción (teoricamente)
@@ -99,8 +111,13 @@ class Visitor(ParseTreeVisitor):
         """
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
 
-        var_index = self.visit(ctx.exp)
-        value = self.tabla.get_by_index(var_index)
+        value = self.visit(ctx.exp)
+        if ctx.exp.ID():
+            var_name = ctx.exp.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            self.load_var(var_index, value)
+        else:
+            self.add_instruction("swap")
 
         printtype = ""
 
@@ -114,7 +131,6 @@ class Visitor(ParseTreeVisitor):
             case bool():
                 printtype = "Z"
 
-        self.add_instruction(f"iload_{var_index}")
         self.add_instruction(f"invokevirtual java/io/PrintStream/println({printtype})V")
 
     def visitInput(self, ctx: MiniBParser.InputContext):
@@ -125,6 +141,8 @@ class Visitor(ParseTreeVisitor):
         prompt = ctx.STRING_LITERAL().getText()[1:-1]  # Remove surrounding quotes
         var_name = ctx.ID().getText()
         var_index = self.tabla.add(var_name, "")
+
+        print(f"{self.tabla}")
 
         # Print the prompt
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
@@ -147,8 +165,6 @@ class Visitor(ParseTreeVisitor):
         )
         # Store the input in the variable
         self.add_instruction(f"astore_{var_index}")
-
-        return var_index
 
     def visitIf(self, ctx: MiniBParser.IfContext):
         else_label = f"ELSE_{self.label_count}"
@@ -264,8 +280,7 @@ class Visitor(ParseTreeVisitor):
 
         self.visit(ctx.op)
 
-        return val0  # Chapuza que he hecho para que funcionen bien los tipos del print
-        # Visit a parse tree produced by MiniBParser#PlusOperation.
+        return val0
 
     def visitPlusOperation(self, ctx: MiniBParser.PlusOperationContext):
         self.add_instruction("iadd")
@@ -331,7 +346,6 @@ class Visitor(ParseTreeVisitor):
         """
         var_name = ctx.ID().getText()
         var_index, var_value = self.tabla.get(var_name)
-        self.add_instruction(f"iload {var_index}")
 
         return var_value
 
