@@ -164,17 +164,19 @@ class Visitor(ParseTreeVisitor):
         self.label_count += 1
 
         self.visit(ctx.cond)
-        self.add_to_last_instruction(f"{else_label}")
-
+        self.add_to_last_instruction(f" {else_label}")
+        
         for stmt in ctx.statif.getChildren():
             self.visit(stmt)
 
         self.add_instruction(f"goto {end_label}")
         self.add_instruction(f"{else_label}:")
+
         if ctx.statelse:
             for stmt in ctx.statelse.getChildren():
                 self.visit(stmt)
-        self.add_to_last_instruction(f"{else_label}")
+
+        self.add_instruction(f"{end_label}:")
 
 
     def visitFor(self, ctx: MiniBParser.ForContext):
@@ -269,10 +271,10 @@ class Visitor(ParseTreeVisitor):
             self.add_instruction("ior")  # OR lógico
 
     def visitCondExp(self, ctx: MiniBParser.CondExpContext):
-        print("En condexp")
-        return self.visit(ctx.expr)  # Evalúa la expresión y devuelve el resultado
+        self.visit(ctx.expr)
+        self.add_instruction("ldc 0")
+        self.add_instruction("if_icmpeq")
 
-    
 
     def visitArithmeticExpression(self, ctx: MiniBParser.ArithmeticExpressionContext):
         val0 = self.visit(ctx.expression(0))
