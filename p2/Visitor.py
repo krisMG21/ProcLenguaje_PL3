@@ -390,7 +390,9 @@ class Visitor(ParseTreeVisitor):
         self.visit(ctx.expression())
 
     def visitNumberExpression(self, ctx: MiniBParser.NumberExpressionContext):
-        # WARNING: Revisar
+        """
+        Interpreta int y float, en bases 10, 16, 8 y 2.
+        """
         num_text = ctx.NUMBER().getText().lower()
         base = 10
         prefixes = {"0x": 16, "0b": 2, "0o": 8}
@@ -429,6 +431,7 @@ class Visitor(ParseTreeVisitor):
         var_name = ctx.ID().getText()
         var_index, var_value = self.tabla.get(var_name)
 
+        self.load_var(var_index, var_value)
         return var_value
 
     def visitFunctionCallExpression(
