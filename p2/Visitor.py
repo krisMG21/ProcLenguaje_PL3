@@ -29,6 +29,14 @@ class Visitor(ParseTreeVisitor):
 """
         return header + "\n".join(self.instructions) + footer
 
+    def add_import(self, import_):
+        """
+        Agrega una instrucción de importación a la lista de instrucciones.
+        Estas se agregan al archivo final entre header y footer.
+        """
+        if import_ in self.imports:
+            self.imports.append(import_)
+
     def add_instruction(self, instruction):
         """
         Agrega una instrucción a la lista de instrucciones.
@@ -40,8 +48,6 @@ class Visitor(ParseTreeVisitor):
         """
         Guarda un valor en la pila, con el tipo de dato adecuado.
         """
-        # self.add_instruction(f"ldc {var_value}")
-
         match var_value:
             case str():
                 self.add_instruction(f"astore_{var_index}")
@@ -61,6 +67,27 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f"iload_{var_index}")
             case float():
                 self.add_instruction(f"fload_{var_index}")
+
+    def concat(self, val0: str, val1: str):
+        self.add_instruction("""
+    new java/lang/StringBuilder
+    dup
+    invokespecial java/lang/StringBuilder/<init>()V
+""")
+        self.add_instruction(f"ldc {val0}")
+        self.add_instruction(
+            "invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+        )
+        self.add_instruction(f"ldc {val1}")
+        self.add_instruction(
+            "invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+        )
+        self.add_instruction(
+            "invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;"
+        )
+        self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
+        self.add_instruction("swap")
+        return val0 + val1
 
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         """
@@ -83,7 +110,7 @@ class Visitor(ParseTreeVisitor):
 
         var_index = self.tabla.add(var_name, var_value)
 
-        self.assign(var_index, var_value)
+        self.store_var(var_index, var_value)
 
     def visitOp(self, ctx: MiniBParser.OpContext):
         """
@@ -125,7 +152,8 @@ class Visitor(ParseTreeVisitor):
                 printtype = "Ljava/lang/String;"
             case bool():
                 printtype = "Z"
-
+            case list():
+                printtype = "Ljava/util/List;"
         self.add_instruction(f"invokevirtual java/io/PrintStream/println({printtype})V")
 
     def visitInput(self, ctx: MiniBParser.InputContext):
@@ -295,31 +323,47 @@ class Visitor(ParseTreeVisitor):
         val1 = 0 if val1 is None else val1
 
         # Contagio de tipo
-        if val1 is float() and val0 is int():
+        if isinstance(val1, float) and isinstance(val0, int):
             val0 = float(val0)
-        elif val0 is float() and val1 is int():
+        elif isinstance(val0, float) and isinstance(val1, int):
             val1 = float(val1)
-        elif val0 is str or val1 is str:
+        elif isinstance(val0, str) or isinstance(val1, str):
             val0, val1 = str(val0), str(val1)
+            val0 = '"' + val0 + '"' if not val0.startswith('"') else val0
+            val1 = '"' + val1 + '"' if not val1.startswith('"') else val1
 
-        print(f"val0:{val0}, val1:{val1}, {type(val0) is type(val1)}")
-
-        op = self.visit(ctx.op)
+        if type(val0) is str and type(val1) is str:
+            val0 = self.concat(val0, val1)
+            return val0
 
         self.add_instruction(f"ldc {val0}")
         self.add_instruction(f"ldc {val1}")
 
+        op = self.visit(ctx.op)
+        instr = ""
+
+        match val0:
+            case int() | bool():
+                val0 = int(val0)
+                instr = "i"
+            case float():
+                instr = "f"
+            case str():
+                instr = "a"
+
         match op:
             case "+":
-                self.add_instruction("iadd")
+                instr += "add"
             case "-":
-                self.add_instruction("isub")
+                instr += "sub"
             case "*":
-                self.add_instruction("imul")
+                instr += "mul"
             case "/":
-                self.add_instruction("idiv")
+                instr += "div"
             case "%":
-                self.add_instruction("irem")
+                instr += "rem"
+
+        self.add_instruction(instr)
 
         return val0
 
@@ -366,16 +410,13 @@ class Visitor(ParseTreeVisitor):
             for i, digit in enumerate(fractional_part):
                 fractional_value += int(digit, base) * (base ** -(i + 1))
             value = integer_value + fractional_value
-            self.add_instruction(f"ldc {value}")
             return value
         else:
             if base != 10:
                 value = int(num_text, base)
-                self.add_instruction(f"ldc {value}")
                 return value
             else:
                 value = float(num_text) if "." in num_text else int(num_text)
-                self.add_instruction(f"ldc {value}")
                 return value
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
