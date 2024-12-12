@@ -167,15 +167,65 @@ public interface MiniBListener extends ParseTreeListener {
 	 */
 	void exitComparisonOp(MiniBParser.ComparisonOpContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniBParser#arithmeticOp}.
+	 * Enter a parse tree produced by the {@code PlusOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
 	 * @param ctx the parse tree
 	 */
-	void enterArithmeticOp(MiniBParser.ArithmeticOpContext ctx);
+	void enterPlusOperation(MiniBParser.PlusOperationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MiniBParser#arithmeticOp}.
+	 * Exit a parse tree produced by the {@code PlusOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
 	 * @param ctx the parse tree
 	 */
-	void exitArithmeticOp(MiniBParser.ArithmeticOpContext ctx);
+	void exitPlusOperation(MiniBParser.PlusOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code MinusOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
+	 * @param ctx the parse tree
+	 */
+	void enterMinusOperation(MiniBParser.MinusOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code MinusOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
+	 * @param ctx the parse tree
+	 */
+	void exitMinusOperation(MiniBParser.MinusOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code MulOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
+	 * @param ctx the parse tree
+	 */
+	void enterMulOperation(MiniBParser.MulOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code MulOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
+	 * @param ctx the parse tree
+	 */
+	void exitMulOperation(MiniBParser.MulOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code DivOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
+	 * @param ctx the parse tree
+	 */
+	void enterDivOperation(MiniBParser.DivOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code DivOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
+	 * @param ctx the parse tree
+	 */
+	void exitDivOperation(MiniBParser.DivOperationContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ModOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
+	 * @param ctx the parse tree
+	 */
+	void enterModOperation(MiniBParser.ModOperationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ModOperation}
+	 * labeled alternative in {@link MiniBParser#arithmeticOp}.
+	 * @param ctx the parse tree
+	 */
+	void exitModOperation(MiniBParser.ModOperationContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code Not}
 	 * labeled alternative in {@link MiniBParser#condition}.

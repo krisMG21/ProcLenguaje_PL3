@@ -7,12 +7,20 @@ from SymbolTable import SymbolTable
 class Visitor(ParseTreeVisitor):
     def __init__(self):
         self.imports = []
+        self.functions = []
         self.instructions = []
-        self.instructions = []
+
         self.label_count = 0
         self.current_var = 0
+
+        # Ambas etiquetas del bucle o control de flujo actual
+        # para que sean accesibles a CONTINUE y EXIT
+        self.start_label = ""
+        self.end_label = ""
+
         self.stack_limit = 100
         self.local_limit = 100
+
         self.tabla = SymbolTable()
 
     def get_jasmin_code(self):
@@ -110,6 +118,7 @@ class Visitor(ParseTreeVisitor):
 
         var_index = self.tabla.add(var_name, var_value)
 
+        self.add_instruction(f"ldc {var_value}")
         self.store_var(var_index, var_value)
 
     def visitOp(self, ctx: MiniBParser.OpContext):
@@ -122,6 +131,7 @@ class Visitor(ParseTreeVisitor):
         var_value = self.visit(ctx.exp)
 
         var_index = self.tabla.mod(var_name, var_value)
+        self.add_instruction(f"ldc {var_value}")
         self.store_var(var_index, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
@@ -139,7 +149,7 @@ class Visitor(ParseTreeVisitor):
             self.load_var(var_index, value)
 
         except AttributeError:
-            pass
+            self.add_instruction(f"ldc {value}")
 
         printtype = ""
 
@@ -193,6 +203,9 @@ class Visitor(ParseTreeVisitor):
         # Crea las labels
         else_label = f"ELSE_{self.label_count}"
         end_label = f"ENDIF_{self.label_count}"
+
+        self.start_label = else_label
+        self.end_label = end_label
         self.label_count += 1
 
         cond = self.visit(ctx.cond)
@@ -215,21 +228,27 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"{end_label}:")
 
     def visitFor(self, ctx: MiniBParser.ForContext):
-        var_index = self.tabla.add(ctx.ID().getText(), "")
         start_label = f"FOR_START_{self.label_count}"
         end_label = f"FOR_END_{self.label_count}"
         self.label_count += 1
 
-        self.visit(ctx.exp1)
-        self.add_instruction(f"istore {var_index}")
+        var_name = ctx.ID().getText()
+        var_value = self.visit(ctx.exp1)
+        self.add_instruction(f"ldc {var_value}")
+
+        var_index = self.tabla.add(var_name, var_value)
+
+        self.store_var(var_index, var_value)
 
         self.add_instruction(f"{start_label}:")
-        self.add_instruction(f"iload {var_index}")
-        self.visit(ctx.exp2)
+
+        self.add_instruction(f"iload_{var_index}")
+        var_value = self.visit(ctx.exp2)
+        self.add_instruction(f"ldc {var_value}")
         self.add_instruction(f"if_icmpgt {end_label}")
 
-        for stmt in ctx.stat():
-            self.visit(stmt)
+        for stmt in ctx.stat.getChildren():
+            value = self.visit(stmt)
 
         self.add_instruction(f"iinc {var_index} 1")
         self.add_instruction(f"goto {start_label}")
@@ -263,11 +282,10 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"ifeq {start_label}")
 
     def visitContinue(self, ctx: MiniBParser.ContinueContext):
-        # This is a simplified version, actual implementation depends on loop context
-        self.add_instruction("goto CONTINUE")
+        self.add_instruction(f"goto {self.start_label}")
 
     def visitExit(self, ctx: MiniBParser.ExitContext):
-        self.add_instruction("return")
+        self.add_instruction(f"goto {self.end_label}")
 
     def visitComparison(self, ctx: MiniBParser.ComparisonContext):
         print("En comparison")
@@ -295,13 +313,11 @@ class Visitor(ParseTreeVisitor):
         return comp
 
     def visitNot(self, ctx: MiniBParser.NotContext):
-        print("En not")
         self.visit(ctx.cond)  # Visita la condición
         self.add_instruction("iconst_1")  # Carga el valor 1 (verdadero)
         self.add_instruction("ixor")  # Realiza XOR para invertir el booleano
 
     def visitLogical(self, ctx: MiniBParser.LogicalContext):
-        print("En logical")
         self.visit(ctx.left)  # Lado izquierdo
         self.visit(ctx.right)  # Lado derecho
 
@@ -390,50 +406,49 @@ class Visitor(ParseTreeVisitor):
         self.visit(ctx.expression())
 
     def visitNumberExpression(self, ctx: MiniBParser.NumberExpressionContext):
-        # WARNING: Revisar
+        """
+        Interpreta int y float, en bases 10, 16, 8 y 2.
+        """
         num_text = ctx.NUMBER().getText().lower()
         base = 10
-        if num_text.startswith("0x"):
-            base = 16
-            num_text = num_text[2:]
-        elif num_text.startswith("0b"):
-            base = 2
-            num_text = num_text[2:]
-        elif num_text.startswith("0o"):
-            base = 8
-            num_text = num_text[2:]
+        prefixes = {"0x": 16, "0b": 2, "0o": 8}
+
+        for prefix, b in prefixes.items():
+            if num_text.startswith(prefix):
+                base = b
+                num_text = num_text[len(prefix) :]
+                break
 
         if "." in num_text:
             integer_part, fractional_part = num_text.split(".")
-            integer_value = int(integer_part, base) if integer_part else 0
-            fractional_value = 0.0
-            for i, digit in enumerate(fractional_part):
-                fractional_value += int(digit, base) * (base ** -(i + 1))
-            value = integer_value + fractional_value
-            return value
+            value = int(integer_part or "0", base)
+            value += sum(
+                int(d, base) * (base ** -(i + 1)) for i, d in enumerate(fractional_part)
+            )
         else:
-            if base != 10:
-                value = int(num_text, base)
-                return value
-            else:
-                value = float(num_text) if "." in num_text else int(num_text)
-                return value
+            value = int(num_text, base)
+
+        # self.add_instruction(f"ldc {value}")
+
+        return float(value) if "." in num_text else value
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         """
         Carga una cadena en la cima del stack.
         """
         value = f"{ctx.STRING_LITERAL().getText()}"
-        self.add_instruction(f"ldc {value}")
-        return value  # Borrar las comillas de " "
+        # self.add_instruction(f"ldc {value}")
+        return value
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
         """
         Carga el valor de la variable en la cima del stack.
         """
         var_name = ctx.ID().getText()
-        var_index, var_value = self.tabla.get(var_name)
+        _, var_value = self.tabla.get(var_name)
+        # print("en id", var_name, var_value)
 
+        # self.load_var(var_index, var_value)
         return var_value
 
     def visitFunctionCallExpression(
@@ -445,7 +460,7 @@ class Visitor(ParseTreeVisitor):
         value = self.visit(ctx.expression())
         try:
             value = int(value)
-        except:
+        except Exception:
             value = None
             print("En VAL() no se ha podido convertir el valor")
         return value

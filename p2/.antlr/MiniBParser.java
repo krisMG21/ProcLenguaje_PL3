@@ -121,6 +121,14 @@ public class MiniBParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_program; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterProgram(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitProgram(this);
+		}
 	}
 
 	public final ProgramContext program() throws RecognitionException {
@@ -219,6 +227,14 @@ public class MiniBParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitStatement(this);
+		}
 	}
 
 	public final StatementContext statement() throws RecognitionException {
@@ -329,6 +345,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public LetContext(LetStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterLet(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitLet(this);
+		}
 	}
 
 	public final LetStmtContext letStmt() throws RecognitionException {
@@ -380,6 +404,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public OpContext(OpStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterOp(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitOp(this);
+		}
 	}
 
 	public final OpStmtContext opStmt() throws RecognitionException {
@@ -428,6 +460,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public PrintContext(PrintStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterPrint(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitPrint(this);
+		}
 	}
 
 	public final PrintStmtContext printStmt() throws RecognitionException {
@@ -473,6 +513,14 @@ public class MiniBParser extends Parser {
 		public TerminalNode ID() { return getToken(MiniBParser.ID, 0); }
 		public TerminalNode STRING_LITERAL() { return getToken(MiniBParser.STRING_LITERAL, 0); }
 		public InputContext(InputStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterInput(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitInput(this);
+		}
 	}
 
 	public final InputStmtContext inputStmt() throws RecognitionException {
@@ -536,6 +584,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(StatementContext.class,i);
 		}
 		public IfContext(IfStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterIf(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitIf(this);
+		}
 	}
 
 	public final IfStmtContext ifStmt() throws RecognitionException {
@@ -652,6 +708,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(StatementContext.class,i);
 		}
 		public ForContext(ForStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterFor(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitFor(this);
+		}
 	}
 
 	public final ForStmtContext forStmt() throws RecognitionException {
@@ -739,6 +803,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(StatementContext.class,i);
 		}
 		public WhileContext(WhileStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterWhile(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitWhile(this);
+		}
 	}
 
 	public final WhileStmtContext whileStmt() throws RecognitionException {
@@ -818,6 +890,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(StatementContext.class,i);
 		}
 		public RepeatContext(RepeatStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterRepeat(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitRepeat(this);
+		}
 	}
 
 	public final RepeatStmtContext repeatStmt() throws RecognitionException {
@@ -881,11 +961,27 @@ public class MiniBParser extends Parser {
 	public static class ContinueContext extends KeyStmtContext {
 		public TerminalNode CONTINUE() { return getToken(MiniBParser.CONTINUE, 0); }
 		public ContinueContext(KeyStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterContinue(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitContinue(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ExitContext extends KeyStmtContext {
 		public TerminalNode EXIT() { return getToken(MiniBParser.EXIT, 0); }
 		public ExitContext(KeyStmtContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterExit(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitExit(this);
+		}
 	}
 
 	public final KeyStmtContext keyStmt() throws RecognitionException {
@@ -934,6 +1030,14 @@ public class MiniBParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_logicalOp; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterLogicalOp(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitLogicalOp(this);
+		}
 	}
 
 	public final LogicalOpContext logicalOp() throws RecognitionException {
@@ -977,6 +1081,14 @@ public class MiniBParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_comparisonOp; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterComparisonOp(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitComparisonOp(this);
+		}
 	}
 
 	public final ComparisonOpContext comparisonOp() throws RecognitionException {
@@ -1025,26 +1137,66 @@ public class MiniBParser extends Parser {
 	public static class ModOperationContext extends ArithmeticOpContext {
 		public TerminalNode MOD() { return getToken(MiniBParser.MOD, 0); }
 		public ModOperationContext(ArithmeticOpContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterModOperation(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitModOperation(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class DivOperationContext extends ArithmeticOpContext {
 		public TerminalNode DIV() { return getToken(MiniBParser.DIV, 0); }
 		public DivOperationContext(ArithmeticOpContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterDivOperation(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitDivOperation(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PlusOperationContext extends ArithmeticOpContext {
 		public TerminalNode PLUS() { return getToken(MiniBParser.PLUS, 0); }
 		public PlusOperationContext(ArithmeticOpContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterPlusOperation(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitPlusOperation(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MulOperationContext extends ArithmeticOpContext {
 		public TerminalNode MUL() { return getToken(MiniBParser.MUL, 0); }
 		public MulOperationContext(ArithmeticOpContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterMulOperation(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitMulOperation(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MinusOperationContext extends ArithmeticOpContext {
 		public TerminalNode MINUS() { return getToken(MiniBParser.MINUS, 0); }
 		public MinusOperationContext(ArithmeticOpContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterMinusOperation(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitMinusOperation(this);
+		}
 	}
 
 	public final ArithmeticOpContext arithmeticOp() throws RecognitionException {
@@ -1129,6 +1281,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ConditionContext.class,0);
 		}
 		public NotContext(ConditionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterNot(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitNot(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CondExpContext extends ConditionContext {
@@ -1137,6 +1297,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public CondExpContext(ConditionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterCondExp(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitCondExp(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ComparisonContext extends ConditionContext {
@@ -1153,6 +1321,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ComparisonOpContext.class,0);
 		}
 		public ComparisonContext(ConditionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterComparison(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitComparison(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class LogicalContext extends ConditionContext {
@@ -1169,6 +1345,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(LogicalOpContext.class,0);
 		}
 		public LogicalContext(ConditionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterLogical(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitLogical(this);
+		}
 	}
 
 	public final ConditionContext condition() throws RecognitionException {
@@ -1279,11 +1463,27 @@ public class MiniBParser extends Parser {
 	public static class StringExpressionContext extends ExpressionContext {
 		public TerminalNode STRING_LITERAL() { return getToken(MiniBParser.STRING_LITERAL, 0); }
 		public StringExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterStringExpression(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitStringExpression(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class IdExpressionContext extends ExpressionContext {
 		public TerminalNode ID() { return getToken(MiniBParser.ID, 0); }
 		public IdExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterIdExpression(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitIdExpression(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ParenExpressionContext extends ExpressionContext {
@@ -1292,11 +1492,27 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public ParenExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterParenExpression(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitParenExpression(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NumberExpressionContext extends ExpressionContext {
 		public TerminalNode NUMBER() { return getToken(MiniBParser.NUMBER, 0); }
 		public NumberExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterNumberExpression(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitNumberExpression(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArithmeticExpressionContext extends ExpressionContext {
@@ -1313,6 +1529,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ArithmeticOpContext.class,0);
 		}
 		public ArithmeticExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterArithmeticExpression(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitArithmeticExpression(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class FunctionCallExpressionContext extends ExpressionContext {
@@ -1321,6 +1545,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(FunctionCallContext.class,0);
 		}
 		public FunctionCallExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterFunctionCallExpression(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitFunctionCallExpression(this);
+		}
 	}
 
 	public final ExpressionContext expression() throws RecognitionException {
@@ -1455,6 +1687,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public IsNanFunctionContext(FunctionCallContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterIsNanFunction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitIsNanFunction(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ValFunctionContext extends FunctionCallContext {
@@ -1464,6 +1704,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public ValFunctionContext(FunctionCallContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterValFunction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitValFunction(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class LenFunctionContext extends FunctionCallContext {
@@ -1473,6 +1721,14 @@ public class MiniBParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public LenFunctionContext(FunctionCallContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).enterLenFunction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniBListener ) ((MiniBListener)listener).exitLenFunction(this);
+		}
 	}
 
 	public final FunctionCallContext functionCall() throws RecognitionException {
