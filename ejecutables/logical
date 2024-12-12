@@ -4,9 +4,9 @@
 .method public static main([Ljava/lang/String;)V
     .limit stack 100
     .limit locals 100
-    ldc "foo"
-    astore_0
-    ldc "bar"
-    astore_0
+    ldc 10
+    istore_0
+    ldc 5
+    istore_1
     return
 .end method

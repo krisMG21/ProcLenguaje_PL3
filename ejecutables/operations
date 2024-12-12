@@ -8,37 +8,31 @@
     ldc 1
     ldc 2
     iadd
-    iload_1
-    invokevirtual java/io/PrintStream/println()V
+    invokevirtual java/io/PrintStream/println(I)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 2
     ldc 1
     isub
-    iload_2
-    invokevirtual java/io/PrintStream/println()V
+    invokevirtual java/io/PrintStream/println(I)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 2
     ldc 3
     imul
-    iload_2
-    invokevirtual java/io/PrintStream/println()V
+    invokevirtual java/io/PrintStream/println(I)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 4
     ldc 2
     idiv
-    iload_4
-    invokevirtual java/io/PrintStream/println()V
+    invokevirtual java/io/PrintStream/println(I)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 7
     ldc 2
     idiv
-    iload_7
-    invokevirtual java/io/PrintStream/println()V
+    invokevirtual java/io/PrintStream/println(I)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 5
     ldc 3
     irem
-    iload_5
-    invokevirtual java/io/PrintStream/println()V
+    invokevirtual java/io/PrintStream/println(I)V
     return
 .end method
