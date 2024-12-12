@@ -13,7 +13,6 @@ class Visitor(ParseTreeVisitor):
         self.local_limit = 100
         self.tabla = SymbolTable()
 
-
     def get_jasmin_code(self):
         header = f""".class public MiniB
 .super java/lang/Object
@@ -28,14 +27,12 @@ class Visitor(ParseTreeVisitor):
 """
         return header + "\n".join(self.instructions) + footer
 
-
     def add_instruction(self, instruction):
         """
         Agrega una instrucción a la lista de instrucciones.
         Estas se agregan al archivo final entre header y footer.
         """
         self.instructions.append(f"    {instruction}")
-
 
     def assign(self, var_index, var_value):
         """
@@ -66,7 +63,6 @@ class Visitor(ParseTreeVisitor):
             self.visit(stmt)
         return self.get_jasmin_code()
 
-
     def visitLet(self, ctx: MiniBParser.LetContext):
         """
         Declara una variable, le asigna un valor, y la almacena
@@ -74,15 +70,14 @@ class Visitor(ParseTreeVisitor):
 
         Guardamos dicha posición en la tabla de simbolos.
         """
-        #print("En let: ", ctx.ID().getText())
+        # print("En let: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
         var_value = self.visit(ctx.exp)
 
-        #print("Valor: ", var_value)
+        # print("Valor: ", var_value)
         var_index = self.tabla.add(var_name, var_value)
 
         self.assign(var_index, var_value)
-
 
     def visitOp(self, ctx: MiniBParser.OpContext):
         """
@@ -97,7 +92,6 @@ class Visitor(ParseTreeVisitor):
         self.tabla.mod(var_name, var_value)
         self.assign(var_index, var_value)
 
-
     def visitPrint(self, ctx: MiniBParser.PrintContext):
         """
         Imprime resultado de una expresión
@@ -106,15 +100,22 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
 
         var_index = self.visit(ctx.exp)
-
         value = self.tabla.get_by_index(var_index)
 
-        # WARNING: POR TERMINAR
+        printtype = ""
 
-        self.add_instruction(f"iload {var_index}")
-        self.add_instruction(
-            f"invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V"
-        )
+        match value:
+            case int():
+                printtype = "I"
+            case float():
+                printtype = "F"
+            case str():
+                printtype = "Ljava/lang/String;"
+            case bool():
+                printtype = "Z"
+
+        self.add_instruction(f"iload_{var_index}")
+        self.add_instruction(f"invokevirtual java/io/PrintStream/println({printtype})V")
 
     def visitInput(self, ctx: MiniBParser.InputContext):
         """
@@ -128,18 +129,22 @@ class Visitor(ParseTreeVisitor):
         # Print the prompt
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
         self.add_instruction(f'ldc "{prompt}"')
-        self.add_instruction("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V")
+        self.add_instruction(
+            "invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V"
+        )
 
         # Create a Scanner object for reading input
         self.add_instruction("new java/util/Scanner")
         self.add_instruction("dup")
         self.add_instruction("getstatic java/lang/System/in Ljava/io/InputStream;")
         self.add_instruction(
-        "invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V"
+            "invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V"
         )
 
         # Read a line of input
-        self.add_instruction("invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;")
+        self.add_instruction(
+            "invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;"
+        )
         # Store the input in the variable
         self.add_instruction(f"astore_{var_index}")
 
