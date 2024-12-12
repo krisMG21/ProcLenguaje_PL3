@@ -110,6 +110,14 @@ class Visitor(ParseTreeVisitor):
         var_value = self.visit(ctx.exp)
 
         var_index = self.tabla.add(var_name, var_value)
+        
+        try:
+            var_name = ctx.right.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            print("load: ", var_index, var_value)
+            self.load_var(var_index, var_value)
+        except AttributeError:
+            self.add_instruction(f"ldc {var_value}")
 
         self.store_var(var_index, var_value)
 
@@ -366,8 +374,20 @@ class Visitor(ParseTreeVisitor):
             val0 = self.concat(val0, val1)
             return val0
 
-        self.add_instruction(f"ldc {val0}")
-        self.add_instruction(f"ldc {val1}")
+        try:
+            var_name = ctx.left.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            print("load: ", var_index, val0)
+            self.load_var(var_index, val0)
+        except AttributeError:
+            self.add_instruction(f"ldc {val0}")
+        try:
+            var_name = ctx.right.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            print("load: ", var_index, val1)
+            self.load_var(var_index, val1)
+        except AttributeError:
+            self.add_instruction(f"ldc {val1}")
 
         op = self.visit(ctx.op)
         instr = ""
