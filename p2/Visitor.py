@@ -393,31 +393,26 @@ class Visitor(ParseTreeVisitor):
         # WARNING: Revisar
         num_text = ctx.NUMBER().getText().lower()
         base = 10
-        if num_text.startswith("0x"):
-            base = 16
-            num_text = num_text[2:]
-        elif num_text.startswith("0b"):
-            base = 2
-            num_text = num_text[2:]
-        elif num_text.startswith("0o"):
-            base = 8
-            num_text = num_text[2:]
+        prefixes = {"0x": 16, "0b": 2, "0o": 8}
+
+        for prefix, b in prefixes.items():
+            if num_text.startswith(prefix):
+                base = b
+                num_text = num_text[len(prefix) :]
+                break
 
         if "." in num_text:
             integer_part, fractional_part = num_text.split(".")
-            integer_value = int(integer_part, base) if integer_part else 0
-            fractional_value = 0.0
-            for i, digit in enumerate(fractional_part):
-                fractional_value += int(digit, base) * (base ** -(i + 1))
-            value = integer_value + fractional_value
-            return value
+            value = int(integer_part or "0", base)
+            value += sum(
+                int(d, base) * (base ** -(i + 1)) for i, d in enumerate(fractional_part)
+            )
         else:
-            if base != 10:
-                value = int(num_text, base)
-                return value
-            else:
-                value = float(num_text) if "." in num_text else int(num_text)
-                return value
+            value = int(num_text, base)
+
+        self.add_instruction(f"ldc {value}")
+
+        return float(value) if "." in num_text else value
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         """
