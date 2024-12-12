@@ -45,11 +45,13 @@ class SymbolTable:
     def mod(self, name: str, value):  # None
         """
         Modifica el valor de un simbolo, si existe, si no lanza un error.
+        Devuelve el índice de la variable
         """
         if name not in self.symbols:
             sys.exit(f"ERROR: Variable {name} no declarada.")
             # Sale del programa
         self.symbols[name] = (self.symbols[name][0], value)
+        return self.symbols[name][0]
 
     def __str__(self):
         """

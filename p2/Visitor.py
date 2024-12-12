@@ -36,22 +36,16 @@ class Visitor(ParseTreeVisitor):
 
     def assign(self, var_index, var_value):
         """
-        Asigna un valor a una variable, y la almacena
-        en su posición de locals.
+        Guarda un valor en la pila, con el tipo de dato adecuado.
         """
+        self.add_instruction(f"ldc {var_value}")
 
         match var_value:
-            case int():
-                self.add_instruction(f"ldc {var_value}")
-                self.add_instruction(f"istore_{var_index}")
             case str():
-                self.add_instruction(f'ldc "{var_value}"')
                 self.add_instruction(f"astore_{var_index}")
-            case bool():
-                self.add_instruction(f'ldc "{var_value}"')
+            case int() | bool():
                 self.add_instruction(f"istore_{var_index}")
             case float():
-                self.add_instruction(f'ldc "{var_value}"')
                 self.add_instruction(f"fstore_{var_index}")
 
     def load_var(self, var_index: int, var_value):
@@ -77,16 +71,14 @@ class Visitor(ParseTreeVisitor):
 
     def visitLet(self, ctx: MiniBParser.LetContext):
         """
-        Declara una variable, le asigna un valor, y la almacena
-        en la siguiente posición de locals.
+        Declara una variable, le asigna el último valor en pila,
+        cena en la siguiente posición de locals.
 
         Guardamos dicha posición en la tabla de simbolos.
         """
-        # print("En let: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
         var_value = self.visit(ctx.exp)
 
-        # print("Valor: ", var_value)
         var_index = self.tabla.add(var_name, var_value)
 
         self.assign(var_index, var_value)
@@ -98,10 +90,9 @@ class Visitor(ParseTreeVisitor):
         """
         # print("En op: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
-        var_index, _ = self.tabla.get(var_name)
         var_value = self.visit(ctx.exp)
 
-        self.tabla.mod(var_name, var_value)
+        var_index = self.tabla.mod(var_name, var_value)
         self.assign(var_index, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
@@ -362,7 +353,7 @@ class Visitor(ParseTreeVisitor):
         """
         Carga una cadena en la cima del stack.
         """
-        value = f"{ctx.STRING_LITERAL().getText()[1:-1]}"
+        value = f"{ctx.STRING_LITERAL().getText()}"
         return value  # Borrar las comillas de " "
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
