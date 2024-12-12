@@ -7,13 +7,21 @@ from SymbolTable import SymbolTable
 class Visitor(ParseTreeVisitor):
     def __init__(self):
         self.imports = []
+        self.functions = []
         self.instructions = []
         self.instructions = []
         self.index_for = []
         self.label_count = 0
         self.current_var = 0
+
+        # Ambas etiquetas del bucle o control de flujo actual
+        # para que sean accesibles a CONTINUE y EXIT
+        self.start_label = ""
+        self.end_label = ""
+
         self.stack_limit = 100
         self.local_limit = 100
+
         self.tabla = SymbolTable()
 
     def get_jasmin_code(self):
@@ -131,6 +139,7 @@ class Visitor(ParseTreeVisitor):
         var_value = self.visit(ctx.exp)
 
         var_index = self.tabla.mod(var_name, var_value)
+        self.add_instruction(f"ldc {var_value}")
         self.store_var(var_index, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
@@ -148,7 +157,7 @@ class Visitor(ParseTreeVisitor):
             self.load_var(var_index, value)
 
         except AttributeError:
-            pass
+            self.add_instruction(f"ldc {value}")
 
         printtype = ""
 
@@ -202,6 +211,9 @@ class Visitor(ParseTreeVisitor):
         # Crea las labels
         else_label = f"ELSE_{self.label_count}"
         end_label = f"ENDIF_{self.label_count}"
+
+        self.start_label = else_label
+        self.end_label = end_label
         self.label_count += 1
 
         cond = self.visit(ctx.cond)
@@ -232,6 +244,7 @@ class Visitor(ParseTreeVisitor):
 
         var_name = ctx.ID().getText()
         var_value = self.visit(ctx.exp1)
+        self.add_instruction(f"ldc {var_value}")
 
         var_index = self.tabla.add(var_name, var_value)
         self.add_instruction(f"ldc {var_value}")
@@ -462,6 +475,7 @@ class Visitor(ParseTreeVisitor):
         else:
             value = int(num_text, base)
 
+        # self.add_instruction(f"ldc {value}")
         #self.add_instruction(f"ldc {value}")
 
         return float(value) if "." in num_text else value
@@ -471,17 +485,19 @@ class Visitor(ParseTreeVisitor):
         Carga una cadena en la cima del stack.
         """
         value = f"{ctx.STRING_LITERAL().getText()}"
-        self.add_instruction(f"ldc {value}")
-        return value  # Borrar las comillas de " "
+        # self.add_instruction(f"ldc {value}")
+        return value
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
         """
         Carga el valor de la variable en la cima del stack.
         """
         var_name = ctx.ID().getText()
+        _, var_value = self.tabla.get(var_name)
+        # print("en id", var_name, var_value)
         var_index, var_value = self.tabla.get(var_name)
 
-        #self.load_var(var_index, var_value)
+        # self.load_var(var_index, var_value)
         return var_value
 
     def visitFunctionCallExpression(
@@ -493,7 +509,7 @@ class Visitor(ParseTreeVisitor):
         value = self.visit(ctx.expression())
         try:
             value = int(value)
-        except:
+        except Exception:
             value = None
             print("En VAL() no se ha podido convertir el valor")
         return value
