@@ -57,7 +57,6 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f'ldc "{var_value}"')
                 self.add_instruction(f"fstore_{var_index}")
 
-
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         """
         Regla raíz, simplemente visita cada instrucción (teoricamente)
@@ -92,9 +91,10 @@ class Visitor(ParseTreeVisitor):
         """
         # print("En op: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
-        var_index = self.tabla.get(var_name)
+        var_index, _ = self.tabla.get(var_name)
         var_value = self.visit(ctx.exp)
 
+        self.tabla.mod(var_name, var_value)
         self.assign(var_index, var_value)
 
 
@@ -105,27 +105,15 @@ class Visitor(ParseTreeVisitor):
         """
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
 
-        value = self.visit(ctx.exp)
+        var_index = self.visit(ctx.exp)
 
-        print_type = ""
-        match value:
-            case int():
-                print_type = "I"
-            case str():
-                print_type = "Ljava/lang/String;"
-            case bool():
-                print_type = "Z"
-            case float():
-                print_type = "F"
-            case list():
-                print_type = "Ljava/util/List;"
-            case dict():
-                print_type = "Ljava/util/Map;"
-            case None:
-                print_type = "V"
+        value = self.tabla.get_by_index(var_index)
 
+        # WARNING: POR TERMINAR
+
+        self.add_instruction(f"iload {var_index}")
         self.add_instruction(
-            f"invokevirtual java/io/PrintStream/println({print_type})V"
+            f"invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V"
         )
 
     def visitInput(self, ctx: MiniBParser.InputContext):
@@ -135,7 +123,7 @@ class Visitor(ParseTreeVisitor):
 
         prompt = ctx.STRING_LITERAL().getText()[1:-1]  # Remove surrounding quotes
         var_name = ctx.ID().getText()
-        var_index = self.tabla.add(var_name, None)
+        var_index = self.tabla.add(var_name, "")
 
         # Print the prompt
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
@@ -154,6 +142,8 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;")
         # Store the input in the variable
         self.add_instruction(f"astore_{var_index}")
+
+        return var_index
 
     def visitIf(self, ctx: MiniBParser.IfContext):
         else_label = f"ELSE_{self.label_count}"
@@ -176,7 +166,7 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"{end_label}:")
 
     def visitFor(self, ctx: MiniBParser.ForContext):
-        var_index = self.tabla.get(ctx.ID().getText())
+        var_index = self.tabla.add(ctx.ID().getText(), "")
         start_label = f"FOR_START_{self.label_count}"
         end_label = f"FOR_END_{self.label_count}"
         self.label_count += 1
@@ -334,9 +324,11 @@ class Visitor(ParseTreeVisitor):
         """
         Carga el valor de la variable en la cima del stack.
         """
-        value = ctx.ID().getText()
+        var_name = ctx.ID().getText()
+        var_index, var_value = self.tabla.get(var_name)
+        self.add_instruction(f"iload {var_index}")
 
-        return value
+        return var_value
 
     def visitFunctionCallExpression(
         self, ctx: MiniBParser.FunctionCallExpressionContext
