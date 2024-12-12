@@ -215,21 +215,25 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"{end_label}:")
 
     def visitFor(self, ctx: MiniBParser.ForContext):
-        var_index = self.tabla.add(ctx.ID().getText(), "")
         start_label = f"FOR_START_{self.label_count}"
         end_label = f"FOR_END_{self.label_count}"
         self.label_count += 1
 
-        self.visit(ctx.exp1)
-        self.add_instruction(f"istore {var_index}")
+        var_name = ctx.ID().getText()
+        var_value = self.visit(ctx.exp1)
+
+        var_index = self.tabla.add(var_name, var_value)
+
+        self.store_var(var_index, var_value)
 
         self.add_instruction(f"{start_label}:")
-        self.add_instruction(f"iload {var_index}")
+
+        self.add_instruction(f"iload_{var_index}")
         self.visit(ctx.exp2)
         self.add_instruction(f"if_icmpgt {end_label}")
 
-        for stmt in ctx.stat():
-            self.visit(stmt)
+        for stmt in ctx.stat.getChildren():
+            value = self.visit(stmt)
 
         self.add_instruction(f"iinc {var_index} 1")
         self.add_instruction(f"goto {start_label}")
@@ -264,10 +268,10 @@ class Visitor(ParseTreeVisitor):
 
     def visitContinue(self, ctx: MiniBParser.ContinueContext):
         # This is a simplified version, actual implementation depends on loop context
-        self.add_instruction("goto CONTINUE")
+        return "CONTINUE"
 
     def visitExit(self, ctx: MiniBParser.ExitContext):
-        self.add_instruction("return")
+        return "EXIT"
 
     def visitComparison(self, ctx: MiniBParser.ComparisonContext):
         print("En comparison")
@@ -295,13 +299,11 @@ class Visitor(ParseTreeVisitor):
         return comp
 
     def visitNot(self, ctx: MiniBParser.NotContext):
-        print("En not")
         self.visit(ctx.cond)  # Visita la condición
         self.add_instruction("iconst_1")  # Carga el valor 1 (verdadero)
         self.add_instruction("ixor")  # Realiza XOR para invertir el booleano
 
     def visitLogical(self, ctx: MiniBParser.LogicalContext):
-        print("En logical")
         self.visit(ctx.left)  # Lado izquierdo
         self.visit(ctx.right)  # Lado derecho
 
@@ -430,8 +432,9 @@ class Visitor(ParseTreeVisitor):
         """
         var_name = ctx.ID().getText()
         var_index, var_value = self.tabla.get(var_name)
+        print("en id", var_name, var_value)
 
-        self.load_var(var_index, var_value)
+        #self.load_var(var_index, var_value)
         return var_value
 
     def visitFunctionCallExpression(
