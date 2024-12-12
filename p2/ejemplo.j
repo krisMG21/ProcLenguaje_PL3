@@ -11,7 +11,7 @@
     ldc 21.5
     invokevirtual java/io/PrintStream/println(F)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 511
-    invokevirtual java/io/PrintStream/println(I)V
+    ldc 511.162109375
+    invokevirtual java/io/PrintStream/println(F)V
     return
 .end method
