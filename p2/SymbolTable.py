@@ -23,7 +23,7 @@ class SymbolTable:
         else:
             self.symbols[name] = (self.var_count, value)
             self.var_count += 1
-        return self.var_count - 1
+        return self.var_count
 
     def get(self, name: str):  # -> int, any
         """
