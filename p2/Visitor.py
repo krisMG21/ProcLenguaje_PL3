@@ -6,6 +6,8 @@ from SymbolTable import SymbolTable
 
 class Visitor(ParseTreeVisitor):
     def __init__(self):
+        self.imports = []
+        self.instructions = []
         self.instructions = []
         self.label_count = 0
         self.current_var = 0
@@ -33,15 +35,12 @@ class Visitor(ParseTreeVisitor):
         Estas se agregan al archivo final entre header y footer.
         """
         self.instructions.append(f"    {instruction}")
-    
-    def add_to_last_instruction(self, instruction):
-        self.instructions[-1] += instruction
 
-    def assign(self, var_index, var_value):
+    def store_var(self, var_index, var_value):
         """
         Guarda un valor en la pila, con el tipo de dato adecuado.
         """
-        #self.add_instruction(f"ldc {var_value}")
+        # self.add_instruction(f"ldc {var_value}")
 
         match var_value:
             case str():
@@ -62,9 +61,6 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f"iload_{var_index}")
             case float():
                 self.add_instruction(f"fload_{var_index}")
-
-    def load_var(self, var_value):
-        self.add_instruction(f"ldc {var_value}")
 
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         """
@@ -99,7 +95,7 @@ class Visitor(ParseTreeVisitor):
         var_value = self.visit(ctx.exp)
 
         var_index = self.tabla.mod(var_name, var_value)
-        self.assign(var_index, var_value)
+        self.store_var(var_index, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
         """
@@ -109,6 +105,14 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
 
         value = self.visit(ctx.exp)
+
+        try:
+            var_name = ctx.exp.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            self.load_var(var_index, value)
+
+        except AttributeError:
+            pass
 
         printtype = ""
 
@@ -129,7 +133,7 @@ class Visitor(ParseTreeVisitor):
         Prints a prompt string, waits for user input, and stores the input in a variable
         """
 
-        prompt = ctx.STRING_LITERAL().getText()[1:-1]  # Remove surrounding quotes
+        prompt = ctx.STRING_LITERAL().getText()
         var_name = ctx.ID().getText()
         var_index = self.tabla.add(var_name, "")
 
@@ -137,7 +141,7 @@ class Visitor(ParseTreeVisitor):
 
         # Print the prompt
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
-        self.add_instruction(f'ldc "{prompt}"')
+        self.add_instruction(f"ldc {prompt}")
         self.add_instruction(
             "invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V"
         )
@@ -158,14 +162,18 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"astore_{var_index}")
 
     def visitIf(self, ctx: MiniBParser.IfContext):
-        #Crea las labels
+        # Crea las labels
         else_label = f"ELSE_{self.label_count}"
         end_label = f"ENDIF_{self.label_count}"
         self.label_count += 1
 
-        self.visit(ctx.cond)
-        self.add_to_last_instruction(f" {else_label}")
-        
+        cond = self.visit(ctx.cond)
+
+        if cond is None:
+            self.add_instruction(f"ifeq {else_label}")
+        else:
+            self.add_instruction(f"{cond} {else_label}")
+
         for stmt in ctx.statif.getChildren():
             self.visit(stmt)
 
@@ -177,7 +185,6 @@ class Visitor(ParseTreeVisitor):
                 self.visit(stmt)
 
         self.add_instruction(f"{end_label}:")
-
 
     def visitFor(self, ctx: MiniBParser.ForContext):
         var_index = self.tabla.add(ctx.ID().getText(), "")
@@ -238,20 +245,26 @@ class Visitor(ParseTreeVisitor):
         print("En comparison")
         self.visit(ctx.left)  # Carga el lado izquierdo de la comparación en la pila
         self.visit(ctx.right)  # Carga el lado derecho de la comparación en la pila
-        
+
         op = ctx.op.getText()  # Operador de comparación
+        comp = ""  # Instrucción de comparación"
+
+        # Se asigna el comparador contrario porque saltamos
+        # al else si es correcto
         if op == "<":
-            self.add_instruction("if_icmplt")
+            comp = "if_icmpge"
         elif op == ">":
-            self.add_instruction("if_icmpgt")
+            comp = "if_icmple"
         elif op == "<=":
-            self.add_instruction("if_icmple")
+            comp = "if_icmpgt"
         elif op == ">=":
-            self.add_instruction("if_icmpge")
+            comp = "if_icmplt"
         elif op == "==":
-            self.add_instruction("if_icmpeq")
+            comp = "if_icmpne"
         elif op == "!=":
-            self.add_instruction("if_icmpne")
+            comp = "if_icmpeq"
+
+        return comp
 
     def visitNot(self, ctx: MiniBParser.NotContext):
         print("En not")
@@ -263,7 +276,7 @@ class Visitor(ParseTreeVisitor):
         print("En logical")
         self.visit(ctx.left)  # Lado izquierdo
         self.visit(ctx.right)  # Lado derecho
-        
+
         op = ctx.op.getText().lower()  # Operador lógico (AND/OR)
         if op == "and":
             self.add_instruction("iand")  # AND lógico
@@ -272,9 +285,6 @@ class Visitor(ParseTreeVisitor):
 
     def visitCondExp(self, ctx: MiniBParser.CondExpContext):
         self.visit(ctx.expr)
-        self.add_instruction("ldc 0")
-        self.add_instruction("if_icmpeq")
-
 
     def visitArithmeticExpression(self, ctx: MiniBParser.ArithmeticExpressionContext):
         val0 = self.visit(ctx.expression(0))
@@ -291,6 +301,8 @@ class Visitor(ParseTreeVisitor):
             val1 = float(val1)
         elif val0 is str or val1 is str:
             val0, val1 = str(val0), str(val1)
+
+        print(f"val0:{val0}, val1:{val1}, {type(val0) is type(val1)}")
 
         op = self.visit(ctx.op)
 
@@ -371,7 +383,7 @@ class Visitor(ParseTreeVisitor):
         Carga una cadena en la cima del stack.
         """
         value = f"{ctx.STRING_LITERAL().getText()}"
-        self.add_instruction(f'ldc {value}')
+        self.add_instruction(f"ldc {value}")
         return value  # Borrar las comillas de " "
 
     def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
