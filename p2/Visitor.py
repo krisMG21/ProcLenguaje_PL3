@@ -273,38 +273,63 @@ class Visitor(ParseTreeVisitor):
 
     def visitArithmeticExpression(self, ctx: MiniBParser.ArithmeticExpressionContext):
         val0 = self.visit(ctx.expression(0))
-        self.add_instruction(f"ldc {val0}")
-
         val1 = self.visit(ctx.expression(1))
+
+        # Tratamiento de nulos
+        val0 = 0 if val0 is None else val0
+        val1 = 0 if val1 is None else val1
+
+        # Contagio de tipo
+        if val1 is float() and val0 is int():
+            val0 = float(val0)
+        elif val0 is float() and val1 is int():
+            val1 = float(val1)
+        elif val0 is str or val1 is str:
+            val0, val1 = str(val0), str(val1)
+
+        op = self.visit(ctx.op)
+
+        self.add_instruction(f"ldc {val0}")
         self.add_instruction(f"ldc {val1}")
 
-        self.visit(ctx.op)
+        match op:
+            case "+":
+                self.add_instruction("iadd")
+            case "-":
+                self.add_instruction("isub")
+            case "*":
+                self.add_instruction("imul")
+            case "/":
+                self.add_instruction("idiv")
+            case "%":
+                self.add_instruction("irem")
 
         return val0
 
     def visitPlusOperation(self, ctx: MiniBParser.PlusOperationContext):
-        self.add_instruction("iadd")
+        return "+"
 
     # Visit a parse tree produced by MiniBParser#MinusOperation.
     def visitMinusOperation(self, ctx: MiniBParser.MinusOperationContext):
-        self.add_instruction("isub")
+        return "-"
 
     # Visit a parse tree produced by MiniBParser#MulOperation.
     def visitMulOperation(self, ctx: MiniBParser.MulOperationContext):
-        self.add_instruction("imul")
+        return "*"
 
     # Visit a parse tree produced by MiniBParser#DivOperation.
     def visitDivOperation(self, ctx: MiniBParser.DivOperationContext):
-        self.add_instruction("idiv")
+        return "/"
 
     # Visit a parse tree produced by MiniBParser#ModOperation.
     def visitModOperation(self, ctx: MiniBParser.ModOperationContext):
-        self.add_instruction("irem")
+        return "%"
 
     def visitParenExpression(self, ctx: MiniBParser.ParenExpressionContext):
         self.visit(ctx.expression())
 
     def visitNumberExpression(self, ctx: MiniBParser.NumberExpressionContext):
+        # WARNING: Revisar
         num_text = ctx.NUMBER().getText().lower()
         base = 10
         if num_text.startswith("0x"):
