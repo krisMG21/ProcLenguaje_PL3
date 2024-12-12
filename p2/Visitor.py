@@ -139,7 +139,7 @@ class Visitor(ParseTreeVisitor):
         var_value = self.visit(ctx.exp)
 
         var_index = self.tabla.mod(var_name, var_value)
-        self.add_instruction(f"ldc {var_value}")
+
         self.store_var(var_index, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
