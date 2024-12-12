@@ -10,6 +10,16 @@
     iload_0
     ldc 5
     if_icmpgt FOR_END_0
+    iload_0
+    ldc 3
+    if_icmple ELSE_1
+    goto FOR_END_0
+    goto ENDIF_1
+    ELSE_1:
+    ENDIF_1:
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    ldc "PEDRO"
+    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     iload_0
     invokevirtual java/io/PrintStream/println(I)V

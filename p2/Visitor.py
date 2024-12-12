@@ -9,6 +9,7 @@ class Visitor(ParseTreeVisitor):
         self.imports = []
         self.instructions = []
         self.instructions = []
+        self.index_for = []
         self.label_count = 0
         self.current_var = 0
         self.stack_limit = 100
@@ -215,7 +216,9 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"{end_label}:")
 
     def visitFor(self, ctx: MiniBParser.ForContext):
+        self.index_for.append(self.label_count)
         start_label = f"FOR_START_{self.label_count}"
+        continue_label = f"FOR_CONTINUE_{self.label_count}"
         end_label = f"FOR_END_{self.label_count}"
         self.label_count += 1
 
@@ -223,21 +226,24 @@ class Visitor(ParseTreeVisitor):
         var_value = self.visit(ctx.exp1)
 
         var_index = self.tabla.add(var_name, var_value)
-
+        self.add_instruction(f"ldc {var_value}")
         self.store_var(var_index, var_value)
 
         self.add_instruction(f"{start_label}:")
 
         self.add_instruction(f"iload_{var_index}")
-        self.visit(ctx.exp2)
+        var2_value = self.visit(ctx.exp2)
+        self.add_instruction(f"ldc {var2_value}")
         self.add_instruction(f"if_icmpgt {end_label}")
 
-        for stmt in ctx.stat.getChildren():
-            value = self.visit(stmt)
+        for stmt in ctx.statement():
+            self.visit(stmt)
 
+        self.add_instruction(f"{continue_label}:")
         self.add_instruction(f"iinc {var_index} 1")
         self.add_instruction(f"goto {start_label}")
         self.add_instruction(f"{end_label}:")
+        self.index_for.pop()
 
     def visitWhile(self, ctx: MiniBParser.WhileContext):
         start_label = f"WHILE_START_{self.label_count}"
@@ -245,8 +251,12 @@ class Visitor(ParseTreeVisitor):
         self.label_count += 1
 
         self.add_instruction(f"{start_label}:")
-        self.visit(ctx.cond)
-        self.add_instruction(f"ifeq {end_label}")
+        cond = self.visit(ctx.cond)
+
+        if cond is None:
+            self.add_instruction(f"ifeq {end_label}")
+        else:
+            self.add_instruction(f"{cond} {end_label}")
 
         for stmt in ctx.statement():
             self.visit(stmt)
@@ -268,15 +278,15 @@ class Visitor(ParseTreeVisitor):
 
     def visitContinue(self, ctx: MiniBParser.ContinueContext):
         # This is a simplified version, actual implementation depends on loop context
-        return "CONTINUE"
+        self.add_instruction(f"goto FOR_CONTINUE_{self.index_for[-1]}")
 
     def visitExit(self, ctx: MiniBParser.ExitContext):
-        return "EXIT"
+        self.add_instruction(f"goto FOR_END_{self.index_for[-1]}")
 
     def visitComparison(self, ctx: MiniBParser.ComparisonContext):
         print("En comparison")
-        self.visit(ctx.left)  # Carga el lado izquierdo de la comparación en la pila
-        self.visit(ctx.right)  # Carga el lado derecho de la comparación en la pila
+        val0 = self.visit(ctx.left)  # Carga el lado izquierdo de la comparación en la pila
+        val1 = self.visit(ctx.right)  # Carga el lado derecho de la comparación en la pila
 
         op = ctx.op.getText()  # Operador de comparación
         comp = ""  # Instrucción de comparación"
@@ -296,6 +306,23 @@ class Visitor(ParseTreeVisitor):
         elif op == "!=":
             comp = "if_icmpeq"
 
+        try:
+            var_name = ctx.left.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            print("load: ", var_index, val0)
+            self.load_var(var_index, val0)
+        except AttributeError:
+            self.add_instruction(f"ldc {val0}")
+        
+        try:
+            var_name = ctx.right.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            print("load: ", var_index, val1)
+            self.load_var(var_index, val1)
+        except AttributeError:
+            self.add_instruction(f"ldc {val1}")
+        
+        
         return comp
 
     def visitNot(self, ctx: MiniBParser.NotContext):
@@ -314,7 +341,8 @@ class Visitor(ParseTreeVisitor):
             self.add_instruction("ior")  # OR lógico
 
     def visitCondExp(self, ctx: MiniBParser.CondExpContext):
-        self.visit(ctx.expr)
+        val = self.visit(ctx.expr)
+        self.add_instruction(f"ldc {val}")
 
     def visitArithmeticExpression(self, ctx: MiniBParser.ArithmeticExpressionContext):
         val0 = self.visit(ctx.expression(0))
@@ -414,7 +442,7 @@ class Visitor(ParseTreeVisitor):
         else:
             value = int(num_text, base)
 
-        self.add_instruction(f"ldc {value}")
+        #self.add_instruction(f"ldc {value}")
 
         return float(value) if "." in num_text else value
 
@@ -432,7 +460,6 @@ class Visitor(ParseTreeVisitor):
         """
         var_name = ctx.ID().getText()
         var_index, var_value = self.tabla.get(var_name)
-        print("en id", var_name, var_value)
 
         #self.load_var(var_index, var_value)
         return var_value
