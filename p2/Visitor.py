@@ -98,6 +98,15 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("swap")
         return val0 + val1
 
+    def try_ID(self, exp, var_value):
+        try:
+            var_name = exp.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            print("load: ", var_index, var_value)
+            self.load_var(var_index, var_value)
+        except AttributeError:
+            self.add_instruction(f"ldc {var_value}")
+
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         """
         Regla raíz, simplemente visita cada instrucción (teoricamente)
@@ -117,15 +126,11 @@ class Visitor(ParseTreeVisitor):
         var_name = ctx.ID().getText()
         var_value = self.visit(ctx.exp)
 
+        self.try_ID(ctx.exp, var_value)
+
         var_index = self.tabla.add(var_name, var_value)
-        
-        try:
-            var_name = ctx.right.ID().getText()
-            var_index, _ = self.tabla.get(var_name)
-            print("load: ", var_index, var_value)
-            self.load_var(var_index, var_value)
-        except AttributeError:
-            self.add_instruction(f"ldc {var_value}")
+
+        print(type(ctx.exp))
 
         self.store_var(var_index, var_value)
 
@@ -151,13 +156,7 @@ class Visitor(ParseTreeVisitor):
 
         value = self.visit(ctx.exp)
 
-        try:
-            var_name = ctx.exp.ID().getText()
-            var_index, _ = self.tabla.get(var_name)
-            self.load_var(var_index, value)
-
-        except AttributeError:
-            self.add_instruction(f"ldc {value}")
+        self.try_ID(ctx.exp, value)
 
         printtype = ""
 
@@ -285,7 +284,6 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"goto {start_label}")
         self.add_instruction(f"{end_label}:")
 
-
     def visitRepeat(self, ctx: MiniBParser.RepeatContext):
         start_label = f"REPEAT_START_{self.label_count}"
         end_label = f"REPEAT_END_{self.label_count}"
@@ -314,8 +312,12 @@ class Visitor(ParseTreeVisitor):
 
     def visitComparison(self, ctx: MiniBParser.ComparisonContext):
         print("En comparison")
-        val0 = self.visit(ctx.left)  # Carga el lado izquierdo de la comparación en la pila
-        val1 = self.visit(ctx.right)  # Carga el lado derecho de la comparación en la pila
+        val0 = self.visit(
+            ctx.left
+        )  # Carga el lado izquierdo de la comparación en la pila
+        val1 = self.visit(
+            ctx.right
+        )  # Carga el lado derecho de la comparación en la pila
 
         op = ctx.op.getText()  # Operador de comparación
         comp = ""  # Instrucción de comparación"
@@ -335,23 +337,9 @@ class Visitor(ParseTreeVisitor):
         elif op == "!=":
             comp = "if_icmpeq"
 
-        try:
-            var_name = ctx.left.ID().getText()
-            var_index, _ = self.tabla.get(var_name)
-            print("load: ", var_index, val0)
-            self.load_var(var_index, val0)
-        except AttributeError:
-            self.add_instruction(f"ldc {val0}")
-        
-        try:
-            var_name = ctx.right.ID().getText()
-            var_index, _ = self.tabla.get(var_name)
-            print("load: ", var_index, val1)
-            self.load_var(var_index, val1)
-        except AttributeError:
-            self.add_instruction(f"ldc {val1}")
-        
-        
+        self.try_ID(ctx.left, val0)
+        self.try_ID(ctx.right, val1)
+
         return comp
 
     def visitNot(self, ctx: MiniBParser.NotContext):
@@ -395,20 +383,8 @@ class Visitor(ParseTreeVisitor):
             val0 = self.concat(val0, val1)
             return val0
 
-        try:
-            var_name = ctx.left.ID().getText()
-            var_index, _ = self.tabla.get(var_name)
-            print("load: ", var_index, val0)
-            self.load_var(var_index, val0)
-        except AttributeError:
-            self.add_instruction(f"ldc {val0}")
-        try:
-            var_name = ctx.right.ID().getText()
-            var_index, _ = self.tabla.get(var_name)
-            print("load: ", var_index, val1)
-            self.load_var(var_index, val1)
-        except AttributeError:
-            self.add_instruction(f"ldc {val1}")
+        self.try_ID(ctx.left, val0)
+        self.try_ID(ctx.right, val1)
 
         op = self.visit(ctx.op)
         instr = ""
@@ -484,7 +460,7 @@ class Visitor(ParseTreeVisitor):
             value = int(num_text, base)
 
         # self.add_instruction(f"ldc {value}")
-        #self.add_instruction(f"ldc {value}")
+        # self.add_instruction(f"ldc {value}")
 
         return float(value) if "." in num_text else value
 
@@ -514,8 +490,7 @@ class Visitor(ParseTreeVisitor):
         return self.visit(ctx.fun)
 
     def visitValFunction(self, ctx: MiniBParser.ValFunctionContext):
-        value = self.visit(ctx.expression())
-        if isinstance(value, str): value = value[1:-1]
+        value = self.visit(ctx.expr)
 
         try:
             value = int(value)
@@ -530,19 +505,14 @@ class Visitor(ParseTreeVisitor):
         Calcula la longitud de un valor dado
         """
         value = self.visit(ctx.expression())
-        if isinstance(value, str): value = value[1:-1]
+        self.try_ID(ctx.expr, value)
 
-        try:
-            var_name = ctx.right.ID().getText()
-            var_index, _ = self.tabla.get(var_name)
-            print("load: ", var_index, value)
-            self.load_var(var_index, len(value))
-        except AttributeError:
-            pass
         # Get length of the value
         return len(value)
 
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
         # Simplified: ISNAN function always returns false (0)
-        
+        value = self.visit(ctx.expr)
+
+        self.try_ID(ctx.expr, value)
         return 0

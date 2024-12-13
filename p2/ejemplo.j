@@ -4,17 +4,17 @@
 .method public static main([Ljava/lang/String;)V
     .limit stack 100
     .limit locals 100
-    ldc 1
-    istore_0
-    FOR_START_0:
-    iload_0
-    ldc 5
-    if_icmpgt FOR_END_0
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    iload_0
-    invokevirtual java/io/PrintStream/println(I)V
-    iinc 0 1
-    goto FOR_START_0
-    FOR_END_0:
+    ldc "Name: "
+    invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
+    new java/util/Scanner
+    dup
+    getstatic java/lang/System/in Ljava/io/InputStream;
+    invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V
+    invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;
+    astore_0
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    aload_0
+    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
     return
 .end method
