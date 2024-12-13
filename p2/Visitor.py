@@ -172,8 +172,13 @@ class Visitor(ParseTreeVisitor):
 
         value = self.visit(ctx.exp)
 
-        self.try_ID(ctx.exp, value, False)
+        is_op = False
+        try:
+            is_op = bool(ctx.exp.op)
+        except Exception:
+            pass
 
+        self.try_ID(ctx.exp, value, not is_op)
         printtype = ""
 
         match value:

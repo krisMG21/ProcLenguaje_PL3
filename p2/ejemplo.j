@@ -4,48 +4,31 @@
 .method public static main([Ljava/lang/String;)V
     .limit stack 100
     .limit locals 100
-    ldc 1
+    ldc 5
     istore_0
-    ldc 1.1
-    fstore_1
+    ldc 10
+    istore_1
+    ldc 15
+    istore_2
+    iload_0
+    iload_1
+    iload_1
+    iload_2
+    iand
+    iload_2
+    ldc 10
+    iconst_1
+    ixor
+    ior
+    ifeq ELSE_0
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    
-    new java/lang/StringBuilder
-    dup
-    invokespecial java/lang/StringBuilder/<init>()V
-
-    ldc "1"
-    invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    ldc "2"
-    invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    swap
+    ldc "Condition met"
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+    goto ENDIF_0
+    ELSE_0:
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 2.0
-    fload_1
-    fsub
-    invokevirtual java/io/PrintStream/println(F)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 2.0
-    ldc 3.3
-    fmul
-    invokevirtual java/io/PrintStream/println(F)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 4.0
-    ldc 2.2
-    fdiv
-    invokevirtual java/io/PrintStream/println(F)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 7.0
-    ldc 2.2
-    fdiv
-    invokevirtual java/io/PrintStream/println(F)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 5.3
-    ldc 3.0
-    frem
-    invokevirtual java/io/PrintStream/println(F)V
+    ldc "Condition not met"
+    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+    ENDIF_0:
     return
 .end method
