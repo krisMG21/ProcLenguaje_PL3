@@ -22,7 +22,7 @@ letStmt:    LET ID '=' exp=expression #Let
 
 opStmt:     ID '=' (exp=expression | cond=condition) #Op
             ;
-arrayOpStmt: ID '[' exp=expression ']' '=' (exp=expression | cond=condition) #ArrayOp
+arrayOpStmt: ID '[' exp1=expression ']' '=' (exp2=expression | cond=condition) #ArrayOp
             ;
 
 printStmt:  PRINT exp=expression #Print

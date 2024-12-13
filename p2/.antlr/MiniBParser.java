@@ -470,7 +470,8 @@ public class MiniBParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArrayOpContext extends ArrayOpStmtContext {
-		public ExpressionContext exp;
+		public ExpressionContext exp1;
+		public ExpressionContext exp2;
 		public ConditionContext cond;
 		public TerminalNode ID() { return getToken(MiniBParser.ID, 0); }
 		public TerminalNode EQ() { return getToken(MiniBParser.EQ, 0); }
@@ -498,7 +499,7 @@ public class MiniBParser extends Parser {
 			setState(82);
 			match(T__0);
 			setState(83);
-			((ArrayOpContext)_localctx).exp = expression(0);
+			((ArrayOpContext)_localctx).exp1 = expression(0);
 			setState(84);
 			match(T__1);
 			setState(85);
@@ -509,7 +510,7 @@ public class MiniBParser extends Parser {
 			case 1:
 				{
 				setState(86);
-				((ArrayOpContext)_localctx).exp = expression(0);
+				((ArrayOpContext)_localctx).exp2 = expression(0);
 				}
 				break;
 			case 2:

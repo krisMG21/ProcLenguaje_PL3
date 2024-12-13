@@ -1,3 +1,4 @@
+
 import sys
 from funciones import VAL, LEN, ISNAN
 from antlr4 import ParseTreeVisitor
@@ -103,25 +104,19 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f"fload_{var_index}")
 
     def concat(self, val0: str, val1: str):
-        self.add_instruction("""
-    new java/lang/StringBuilder
-    dup
-    invokespecial java/lang/StringBuilder/<init>()V
-""")
+        # En vez de triple comillas, añadir cada instrucción por separado
+        self.add_instruction("new java/lang/StringBuilder")
+        self.add_instruction("dup")
+        self.add_instruction("invokespecial java/lang/StringBuilder/<init>()V")
         self.add_instruction(f"ldc {val0}")
-        self.add_instruction(
-            "invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;"
-        )
+        self.add_instruction("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;")
         self.add_instruction(f"ldc {val1}")
-        self.add_instruction(
-            "invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;"
-        )
-        self.add_instruction(
-            "invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;"
-        )
+        self.add_instruction("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;")
+        self.add_instruction("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;")
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
         self.add_instruction("swap")
         return val0 + val1
+
 
     def try_ID(self, exp, var_value, load=True):
         try:
@@ -188,33 +183,44 @@ class Visitor(ParseTreeVisitor):
     def visitPrint(self, ctx: MiniBParser.PrintContext):
         """
         Imprime resultado de una expresión
-        (lo que se encuentre en la cima del stack)
         """
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
 
         value = self.visit(ctx.exp)
 
-        is_op = False
-        try:
-            is_op = bool(ctx.exp.op or ctx.exp.func)
-        except Exception:
-            pass
+        # Verifica si la expresión es un acceso a array
+        if isinstance(ctx.exp, MiniBParser.ArrayAccessExpressionContext):
+            # Como es un acceso a array y usamos iaload, en la pila hay un int
+            # No llamamos a try_ID, y asignamos printtype directamente
+            printtype = "I"
+        else:
+            # Caso normal
+            is_op = False
+            try:
+                is_op = bool(ctx.exp.op or ctx.exp.func)
+            except Exception:
+                pass
 
-        self.try_ID(ctx.exp, value, not is_op)
-        printtype = ""
+            self.try_ID(ctx.exp, value, not is_op)
 
-        match value:
-            case int():
-                printtype = "I"
-            case float():
-                printtype = "F"
-            case str():
-                printtype = "Ljava/lang/String;"
-            case bool():
-                printtype = "Z"
-            case list():
-                printtype = "Ljava/util/List;"
+            # Asignar printtype según el valor
+            match value:
+                case int():
+                    printtype = "I"
+                case float():
+                    printtype = "F"
+                case str():
+                    printtype = "Ljava/lang/String;"
+                case bool():
+                    printtype = "Z"
+                case list():
+                    printtype = "Ljava/util/List;"
+                case _:
+                    # Por si acaso, un valor por defecto
+                    printtype = "Ljava/lang/Object;"
+
         self.add_instruction(f"invokevirtual java/io/PrintStream/println({printtype})V")
+
 
     def visitInput(self, ctx: MiniBParser.InputContext):
         """
@@ -499,10 +505,11 @@ class Visitor(ParseTreeVisitor):
             value += sum(
                 int(d, base) * (base ** -(i + 1)) for i, d in enumerate(fractional_part)
             )
+            value = float(value)
         else:
             value = int(num_text, base)
 
-        return float(value) if "." in num_text else value
+        return value
 
     def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         """
@@ -568,3 +575,199 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("invokestatic MiniB/len(Ljava/lang/Object;)I;")
 
         return 0
+
+    def visitDim(self, ctx: MiniBParser.DimContext):
+        """
+        Define una variable de tipo array.
+        Ejemplo:
+        DIM numbers[3]
+
+        Pasos:
+        1. Calcular el tamaño del array visitando ctx.exp
+        2. Crear el array con 'newarray int'
+        3. Guardar en la tabla de símbolos y almacenar en locals con 'astore_x'
+        """
+        var_name = ctx.ID().getText()
+        size = self.visit(ctx.exp)  # Calcula la dimensión
+
+        # Cargar el tamaño en la pila
+        self.add_instruction(f"ldc {size}")
+
+        # Crear un array de enteros
+        # Opciones: newarray <atype> donde <atype> para int es 'int'
+        # atype (Tipos primitivos): T_BOOLEAN=4, T_CHAR=5, T_FLOAT=6, T_DOUBLE=7, T_BYTE=8, T_SHORT=9, T_INT=10, T_LONG=11
+        # Para int:
+        self.add_instruction("newarray int")
+
+        # Añadimos la variable a la tabla de símbolos
+        # Asumimos que se guardará el array como tipo 'list()' o None. Aquí lo dejamos como None.
+        var_index = self.tabla.add(var_name, None)
+
+        # Guardamos la referencia del array en un local
+        self.add_instruction(f"astore_{var_index}")
+
+    def visitArrayOp(self, ctx: MiniBParser.ArrayOpContext):
+        var_name = ctx.ID().getText()
+        var_index, _ = self.tabla.get(var_name)
+
+        # Cargar la referencia del array
+        self.add_instruction(f"aload_{var_index}")  # stack: [arrayref]
+
+        # Cargar el índice
+        index_value = self.visit(ctx.exp1)
+        # Si el índice no es una operación aritmética o acceso a array (que ya pone valor en pila),
+        # llamamos a try_ID
+        if not isinstance(ctx.exp1, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.exp1, MiniBParser.ArrayAccessExpressionContext):
+            self.try_ID(ctx.exp1, index_value)
+
+        # Cargar el valor a asignar
+        if ctx.exp2:
+            value = self.visit(ctx.exp2)
+            # Igual que con el índice, si exp2 NO es aritmética ni acceso a array, usar try_ID
+            if not isinstance(ctx.exp2, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.exp2, MiniBParser.ArrayAccessExpressionContext):
+                self.try_ID(ctx.exp2, value)
+        else:
+            value = self.visit(ctx.cond)
+            # Si es una condición simple, probablemente necesites el try_ID, salvo que sea aritmética o array
+            if not isinstance(ctx.cond, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.cond, MiniBParser.ArrayAccessExpressionContext):
+                self.try_ID(ctx.cond, value)
+
+        # stack: [arrayref, index, value]
+
+        self.add_instruction("iastore")
+
+
+
+
+        
+    def visitArrayAccessExpression(self, ctx: MiniBParser.ArrayAccessExpressionContext):
+        var_name = ctx.ID().getText()
+        var_index, _ = self.tabla.get(var_name)
+
+        # Cargar la referencia del array
+        self.add_instruction(f"aload_{var_index}")  # stack: [arrayref]
+
+        # Evaluar y cargar el índice
+        index_value = self.visit(ctx.expr)
+        self.try_ID(ctx.expr, index_value)
+        # stack: [arrayref, index]
+
+        # Cargar el valor del array
+        self.add_instruction("iaload")
+        # stack: [value]
+
+        return None
+
+    def visitRedim(self, ctx: MiniBParser.RedimContext):
+        """
+        Redimensiona un array existente:
+        1. Guarda el array antiguo en una variable temporal.
+        2. Obtiene longitudes.
+        3. Crea el nuevo array.
+        4. Copia los elementos uno a uno hasta el minimo.
+        """
+
+        var_name = ctx.ID().getText()
+        var_index, _ = self.tabla.get(var_name)
+
+        # Visitar la expresión de la nueva dimensión
+        new_size = self.visit(ctx.exp)
+        self.try_ID(ctx.exp, new_size)
+
+        # Necesitamos variables locales temporales:
+        # temp_array_index = siguiente local libre
+        # old_length_index = siguiente local libre
+        # new_length_index = siguiente local libre
+        # loop_index = siguiente local libre
+        # min_length_index = siguiente local libre
+
+        # Suponiendo que cada add en la tabla suma uno, y que las variables se añadieron en orden,
+        # podemos asignar índices extra manualmente. Por simplicidad, supongamos:
+        temp_array_index = self.tabla.add("$temp_old_array", None)
+        old_length_index = self.tabla.add("$old_length", 0)
+        new_length_index = self.tabla.add("$new_length", 0)
+        min_length_index = self.tabla.add("$min_length", 0)
+        loop_index = self.tabla.add("$i_loop", 0)
+
+        # 1. Guardar el array original en temp
+        self.add_instruction(f"aload_{var_index}")         # cargar array antiguo
+        self.add_instruction(f"astore_{temp_array_index}") # temp = old_array
+
+        # 2. Obtener su longitud
+        self.add_instruction(f"aload_{temp_array_index}")
+        self.add_instruction("arraylength")
+        self.add_instruction(f"istore_{old_length_index}")
+
+        # 3. Guardar el new_size en una variable local
+        # En este punto la pila tiene new_size por el try_ID
+        # Si no está en la pila, haz un ldc:
+        # Si new_size es int (lo normal), ya lo has cargado con try_ID (ldc x).
+        # Así que:
+        # (En caso de no tenerlo en pila, harías: self.add_instruction(f"ldc {new_size}"))
+        self.add_instruction(f"ldc {new_size}")
+        self.add_instruction(f"istore_{new_length_index}")
+
+        # 4. Crear el nuevo array con el new_size
+        self.add_instruction(f"iload_{new_length_index}")
+        self.add_instruction("newarray int")
+        self.add_instruction(f"astore_{var_index}")
+
+        # 5. Determinar el mínimo entre old_length y new_length
+        # if (old_length <= new_length) min = old_length else min = new_length
+        label_less_equal = f"MIN_LE_{self.label_count}"
+        label_end_min = f"MIN_END_{self.label_count}"
+        self.label_count += 1
+
+        self.add_instruction(f"iload_{old_length_index}")
+        self.add_instruction(f"iload_{new_length_index}")
+        self.add_instruction(f"if_icmple {label_less_equal}")  # if old_length <= new_length -> goto label_less_equal
+
+        # else:
+        self.add_instruction(f"iload_{new_length_index}")
+        self.add_instruction(f"istore_{min_length_index}")
+        self.add_instruction(f"goto {label_end_min}")
+
+        # then:
+        self.add_instruction(f"{label_less_equal}:")
+        self.add_instruction(f"iload_{old_length_index}")
+        self.add_instruction(f"istore_{min_length_index}")
+
+        self.add_instruction(f"{label_end_min}:")
+
+        # 6. Copiar elemento a elemento
+        # for (i = 0; i < min_length; i++):
+        start_label = f"COPY_START_{self.label_count}"
+        end_label = f"COPY_END_{self.label_count}"
+        self.label_count += 1
+
+        # i = 0
+        self.add_instruction(f"iconst_0")
+        self.add_instruction(f"istore_{loop_index}")
+
+        self.add_instruction(f"{start_label}:")
+
+        # if i >= min_length goto end
+        self.add_instruction(f"iload_{loop_index}")
+        self.add_instruction(f"iload_{min_length_index}")
+        self.add_instruction(f"if_icmpge {end_label}")
+
+        # cargar old array
+        self.add_instruction(f"aload_{var_index}")          # new arrayref
+        self.add_instruction(f"iload_{loop_index}")         # index en new array
+
+        self.add_instruction(f"aload_{temp_array_index}")    # old arrayref
+        self.add_instruction(f"iload_{loop_index}")          # index en old array
+        self.add_instruction("iaload")                       # valor old_array[i]
+
+        self.add_instruction("iastore")                      # new_array[i] = old_array[i]
+
+        # i++
+        self.add_instruction(f"iinc {loop_index} 1")
+        self.add_instruction(f"goto {start_label}")
+
+        self.add_instruction(f"{end_label}:")
+
+        # Ahora el array ya está redimensionado y copiado
+        # Nota: Si sobran posiciones en el nuevo array, se quedan como 0 por defecto.
+        # Si se reduce el tamaño, simplemente no se copian los extra.
+

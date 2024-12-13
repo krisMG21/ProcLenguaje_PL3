@@ -615,7 +615,8 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.ArrayOpStmtContext
             super().__init__(parser)
-            self.exp = None # ExpressionContext
+            self.exp1 = None # ExpressionContext
+            self.exp2 = None # ExpressionContext
             self.cond = None # ConditionContext
             self.copyFrom(ctx)
 
@@ -653,7 +654,7 @@ class MiniBParser ( Parser ):
             self.state = 82
             self.match(MiniBParser.T__0)
             self.state = 83
-            localctx.exp = self.expression(0)
+            localctx.exp1 = self.expression(0)
             self.state = 84
             self.match(MiniBParser.T__1)
             self.state = 85
@@ -663,7 +664,7 @@ class MiniBParser ( Parser ):
             la_ = self._interp.adaptivePredict(self._input,5,self._ctx)
             if la_ == 1:
                 self.state = 86
-                localctx.exp = self.expression(0)
+                localctx.exp2 = self.expression(0)
                 pass
 
             elif la_ == 2:

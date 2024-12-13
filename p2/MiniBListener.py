@@ -44,6 +44,15 @@ class MiniBListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MiniBParser#ArrayOp.
+    def enterArrayOp(self, ctx:MiniBParser.ArrayOpContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#ArrayOp.
+    def exitArrayOp(self, ctx:MiniBParser.ArrayOpContext):
+        pass
+
+
     # Enter a parse tree produced by MiniBParser#Print.
     def enterPrint(self, ctx:MiniBParser.PrintContext):
         pass
@@ -116,6 +125,24 @@ class MiniBListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MiniBParser#Dim.
+    def enterDim(self, ctx:MiniBParser.DimContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#Dim.
+    def exitDim(self, ctx:MiniBParser.DimContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniBParser#Redim.
+    def enterRedim(self, ctx:MiniBParser.RedimContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#Redim.
+    def exitRedim(self, ctx:MiniBParser.RedimContext):
+        pass
+
+
     # Enter a parse tree produced by MiniBParser#logicalOp.
     def enterLogicalOp(self, ctx:MiniBParser.LogicalOpContext):
         pass
@@ -134,30 +161,48 @@ class MiniBListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MiniBParser#arithmeticOp.
-    def enterArithmeticOp(self, ctx:MiniBParser.ArithmeticOpContext):
+    # Enter a parse tree produced by MiniBParser#PlusOperation.
+    def enterPlusOperation(self, ctx:MiniBParser.PlusOperationContext):
         pass
 
-    # Exit a parse tree produced by MiniBParser#arithmeticOp.
-    def exitArithmeticOp(self, ctx:MiniBParser.ArithmeticOpContext):
-        pass
-
-
-    # Enter a parse tree produced by MiniBParser#Not.
-    def enterNot(self, ctx:MiniBParser.NotContext):
-        pass
-
-    # Exit a parse tree produced by MiniBParser#Not.
-    def exitNot(self, ctx:MiniBParser.NotContext):
+    # Exit a parse tree produced by MiniBParser#PlusOperation.
+    def exitPlusOperation(self, ctx:MiniBParser.PlusOperationContext):
         pass
 
 
-    # Enter a parse tree produced by MiniBParser#condExp.
-    def enterCondExp(self, ctx:MiniBParser.CondExpContext):
+    # Enter a parse tree produced by MiniBParser#MinusOperation.
+    def enterMinusOperation(self, ctx:MiniBParser.MinusOperationContext):
         pass
 
-    # Exit a parse tree produced by MiniBParser#condExp.
-    def exitCondExp(self, ctx:MiniBParser.CondExpContext):
+    # Exit a parse tree produced by MiniBParser#MinusOperation.
+    def exitMinusOperation(self, ctx:MiniBParser.MinusOperationContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniBParser#MulOperation.
+    def enterMulOperation(self, ctx:MiniBParser.MulOperationContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#MulOperation.
+    def exitMulOperation(self, ctx:MiniBParser.MulOperationContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniBParser#DivOperation.
+    def enterDivOperation(self, ctx:MiniBParser.DivOperationContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#DivOperation.
+    def exitDivOperation(self, ctx:MiniBParser.DivOperationContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniBParser#ModOperation.
+    def enterModOperation(self, ctx:MiniBParser.ModOperationContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#ModOperation.
+    def exitModOperation(self, ctx:MiniBParser.ModOperationContext):
         pass
 
 
@@ -170,12 +215,30 @@ class MiniBListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MiniBParser#Not.
+    def enterNot(self, ctx:MiniBParser.NotContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#Not.
+    def exitNot(self, ctx:MiniBParser.NotContext):
+        pass
+
+
     # Enter a parse tree produced by MiniBParser#Logical.
     def enterLogical(self, ctx:MiniBParser.LogicalContext):
         pass
 
     # Exit a parse tree produced by MiniBParser#Logical.
     def exitLogical(self, ctx:MiniBParser.LogicalContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniBParser#condExp.
+    def enterCondExp(self, ctx:MiniBParser.CondExpContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#condExp.
+    def exitCondExp(self, ctx:MiniBParser.CondExpContext):
         pass
 
 
@@ -221,6 +284,15 @@ class MiniBListener(ParseTreeListener):
 
     # Exit a parse tree produced by MiniBParser#ArithmeticExpression.
     def exitArithmeticExpression(self, ctx:MiniBParser.ArithmeticExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniBParser#ArrayAccessExpression.
+    def enterArrayAccessExpression(self, ctx:MiniBParser.ArrayAccessExpressionContext):
+        pass
+
+    # Exit a parse tree produced by MiniBParser#ArrayAccessExpression.
+    def exitArrayAccessExpression(self, ctx:MiniBParser.ArrayAccessExpressionContext):
         pass
 
 
