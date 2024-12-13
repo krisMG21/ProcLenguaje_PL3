@@ -1,4 +1,5 @@
 import sys
+from funciones import VAL, LEN, ISNAN
 from antlr4 import ParseTreeVisitor
 from MiniBParser import MiniBParser
 from SymbolTable import SymbolTable
@@ -13,11 +14,6 @@ class Visitor(ParseTreeVisitor):
         self.index_for = []
         self.label_count = 0
         self.current_var = 0
-
-        # Ambas etiquetas del bucle o control de flujo actual
-        # para que sean accesibles a CONTINUE y EXIT
-        self.start_label = ""
-        self.end_label = ""
 
         self.stack_limit = 100
         self.local_limit = 100
@@ -56,7 +52,8 @@ class Visitor(ParseTreeVisitor):
         Agrega una función a la lista de funciones.
         Estas se agregan al archivo final entre header y footer.
         """
-        self.functions.append(function)
+        if function in self.functions:
+            print(f"Warning: función {function}")
 
     def add_instruction(self, instruction):
         """
@@ -70,7 +67,7 @@ class Visitor(ParseTreeVisitor):
         Guarda un valor en la pila, con el tipo de dato adecuado.
         """
         match var_value:
-            case str():
+            case str() | None:
                 self.add_instruction(f"astore_{var_index}")
             case int() | bool():
                 self.add_instruction(f"istore_{var_index}")
@@ -82,7 +79,7 @@ class Visitor(ParseTreeVisitor):
         Carga una variable en la pila.
         """
         match var_value:
-            case str():
+            case str() | None:
                 self.add_instruction(f"aload_{var_index}")
             case int() | bool():
                 self.add_instruction(f"iload_{var_index}")
@@ -110,13 +107,14 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("swap")
         return val0 + val1
 
-    def try_ID(self, exp, var_value):
+    def try_ID(self, exp, var_value, load=True):
         try:
             var_name = exp.ID().getText()
             var_index, _ = self.tabla.get(var_name)
             self.load_var(var_index, var_value)
         except AttributeError:
-            self.add_instruction(f"ldc {var_value}")
+            if load:
+                self.add_instruction(f"ldc {var_value}")
 
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         """
@@ -125,6 +123,9 @@ class Visitor(ParseTreeVisitor):
         """
         for stmt in ctx.statement():
             self.visit(stmt)
+
+        self.error = self.error or self.tabla.error
+
         return self.get_jasmin_code()
 
     def visitLet(self, ctx: MiniBParser.LetContext):
@@ -140,8 +141,6 @@ class Visitor(ParseTreeVisitor):
         self.try_ID(ctx.exp, var_value)
 
         var_index = self.tabla.add(var_name, var_value)
-
-        print(type(ctx.exp))
 
         self.store_var(var_index, var_value)
 
@@ -167,7 +166,7 @@ class Visitor(ParseTreeVisitor):
 
         value = self.visit(ctx.exp)
 
-        self.try_ID(ctx.exp, value)
+        self.try_ID(ctx.exp, value, False)
 
         printtype = ""
 
@@ -192,8 +191,6 @@ class Visitor(ParseTreeVisitor):
         prompt = ctx.STRING_LITERAL().getText()
         var_name = ctx.ID().getText()
         var_index = self.tabla.add(var_name, "")
-
-        print(f"{self.tabla}")
 
         # Print the prompt
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
@@ -498,18 +495,25 @@ class Visitor(ParseTreeVisitor):
     def visitFunctionCallExpression(
         self, ctx: MiniBParser.FunctionCallExpressionContext
     ):
+        fname = ctx.fun.getText()
+        # Leer nombre de función y llamarla con MiniB/nombre
+        # Leer los parámetros para cargarlos en la pila
         return self.visit(ctx.fun)
 
     def visitValFunction(self, ctx: MiniBParser.ValFunctionContext):
         value = self.visit(ctx.expr)
 
+        self.add_function(VAL)
+
+        self.try_ID(ctx.expr, value)
+        self.add_instruction("invokestatic MiniB/val")
+
         try:
             value = int(value)
         except Exception:
             value = None
-            print("En VAL() no se ha podido convertir el valor")
+            # print("En VAL() no se ha podido convertir el valor")
         return value
-        # VAL function is treated as identity function in this simplified version
 
     def visitLenFunction(self, ctx: MiniBParser.LenFunctionContext):
         """
@@ -517,25 +521,18 @@ class Visitor(ParseTreeVisitor):
         """
         value = self.visit(ctx.expr)
 
-        self.add_function("""
-    .method public static length()I
-        .limit stack 1
-        .limit locals 0
-
-        ; El String ya está en la cima de la pila
-        invokevirtual java/lang/String/length()I
-
-        ; Retorna el resultado (que ya está en la pila)
-        ireturn
-    .end method
-        """)
+        self.add_function(LEN)
 
         self.try_ID(ctx.expr, value)
-        self.add_instruction("invokestatic MiniB/length()I")
+        self.add_instruction("invokestatic MiniB/len()I")
         return len(value)
 
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
         value = self.visit(ctx.expr)
+
+        self.add_function(ISNAN)
+
         self.try_ID(ctx.expr, value)
+        self.add_instruction("invokestatic MiniB/isNaN(Ljava/lang/Object;)I;")
 
         return 0

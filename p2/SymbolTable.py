@@ -12,6 +12,7 @@ class SymbolTable:
         """
         self.symbols = {}
         self.var_count = 0
+        self.error = False
 
     def add(self, name: str, value):  # -> int, any
         """
@@ -30,8 +31,9 @@ class SymbolTable:
         Devuelve el valor e indice de un simbolo, si existe, si no lanza un error.
         """
         if name not in self.symbols:
-            sys.exit(f"ERROR: Variable {name} no declarada.")
-            # Sale del programa
+            print(f"ERROR: Variable {name} no declarada.")
+            error = True
+
         return self.symbols[name]
 
     def get_by_index(self, index: int):  # -> str, any
@@ -48,8 +50,9 @@ class SymbolTable:
         Devuelve el índice de la variable
         """
         if name not in self.symbols:
-            sys.exit(f"ERROR: Variable {name} no declarada.")
-            # Sale del programa
+            print(f"ERROR: Variable {name} no declarada.")
+            error = True
+
         self.symbols[name] = (self.symbols[name][0], value)
         return self.symbols[name][0]
 

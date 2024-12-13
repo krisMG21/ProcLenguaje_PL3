@@ -1,5 +1,8 @@
-PRINT 1+"2"
-PRINT 2-1.1
+LET a = 1
+LET b = 1.1
+
+PRINT a+"2"
+PRINT 2-b
 PRINT 2*3.3
 PRINT 4/2.2
 PRINT 7/2.2

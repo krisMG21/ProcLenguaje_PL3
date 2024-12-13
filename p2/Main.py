@@ -30,7 +30,10 @@ def main():
         generate_visitor()
 
     if "c" in modes:
-        jasmin_text = compile_source(file)
+        jasmin_text, error = compile_source(file)
+        if error:
+            print("Error/es al compilar el código fuente.")
+            sys.exit(1)
         with open(output, "w") as f:
             print("Guardando archivo en:", output)
             f.write(jasmin_text)
@@ -63,7 +66,8 @@ def compile_source(file):
     parser: MiniBParser = MiniBParser(tokens)
     tree: ParseTree = parser.program()
     visitor: Visitor = Visitor()
-    return visitor.visit(tree)
+    text: str = visitor.visit(tree)
+    return text, visitor.error
 
 
 def compile_to_bytecode(jasmin_file):
