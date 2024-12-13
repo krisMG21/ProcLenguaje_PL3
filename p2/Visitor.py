@@ -285,17 +285,21 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"goto {start_label}")
         self.add_instruction(f"{end_label}:")
 
+
     def visitRepeat(self, ctx: MiniBParser.RepeatContext):
         start_label = f"REPEAT_START_{self.label_count}"
+        end_label = f"REPEAT_END_{self.label_count}"
         self.label_count += 1
 
         self.add_instruction(f"{start_label}:")
 
-        for stmt in ctx.stat():
+        for stmt in ctx.statement():
             self.visit(stmt)
 
         self.visit(ctx.cond)
+
         self.add_instruction(f"ifeq {start_label}")
+        self.add_instruction(f"{end_label}:")
 
     def visitContinue(self, ctx: MiniBParser.ContinueContext):
         # This is a simplified version, actual implementation depends on loop context
