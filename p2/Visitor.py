@@ -155,9 +155,7 @@ class Visitor(ParseTreeVisitor):
         var_name = ctx.ID().getText()
         var_value = self.visit(ctx.exp)
 
-        var_index = self.tabla.mod(var_name, var_value)
-
-        self.store_var(var_index, var_value)
+        _ = self.tabla.mod(var_name, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
         """
@@ -167,6 +165,10 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
 
         value = self.visit(ctx.exp)
+        if value is str() and not value[1:-1].contains('"'):
+            self.add_instruction(f"ldc {value}")
+        elif value is not str():
+            self.add_instruction(f"ldc {value}")
 
         self.try_ID(ctx.exp, value, False)
 
@@ -468,9 +470,6 @@ class Visitor(ParseTreeVisitor):
             )
         else:
             value = int(num_text, base)
-
-        # self.add_instruction(f"ldc {value}")
-        # self.add_instruction(f"ldc {value}")
 
         return float(value) if "." in num_text else value
 
