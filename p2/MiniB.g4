@@ -5,6 +5,7 @@ program:    (statement NEWLINE+)* statement? EOF
 
 statement:  letStmt
             | opStmt
+            | arrayOpStmt
             | printStmt
             | inputStmt
             | ifStmt
@@ -20,6 +21,8 @@ letStmt:    LET ID '=' exp=expression #Let
             ;
 
 opStmt:     ID '=' (exp=expression | cond=condition) #Op
+            ;
+arrayOpStmt: ID '[' exp=expression ']' '=' (exp=expression | cond=condition) #ArrayOp
             ;
 
 printStmt:  PRINT exp=expression #Print

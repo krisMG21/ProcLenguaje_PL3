@@ -29,6 +29,11 @@ class MiniBVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniBParser#ArrayOp.
+    def visitArrayOp(self, ctx:MiniBParser.ArrayOpContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniBParser#Print.
     def visitPrint(self, ctx:MiniBParser.PrintContext):
         return self.visitChildren(ctx)
