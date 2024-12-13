@@ -69,6 +69,16 @@ class MiniBVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniBParser#Dim.
+    def visitDim(self, ctx:MiniBParser.DimContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniBParser#Redim.
+    def visitRedim(self, ctx:MiniBParser.RedimContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniBParser#logicalOp.
     def visitLogicalOp(self, ctx:MiniBParser.LogicalOpContext):
         return self.visitChildren(ctx)
@@ -146,6 +156,11 @@ class MiniBVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by MiniBParser#ArithmeticExpression.
     def visitArithmeticExpression(self, ctx:MiniBParser.ArithmeticExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniBParser#ArrayAccessExpression.
+    def visitArrayAccessExpression(self, ctx:MiniBParser.ArrayAccessExpressionContext):
         return self.visitChildren(ctx)
 
 
