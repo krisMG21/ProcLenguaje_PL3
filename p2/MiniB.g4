@@ -46,10 +46,10 @@ keyStmt:    CONTINUE #Continue
             | EXIT #Exit
             ;
 
-dimStmt:    DIM ID '[' expression ']' #Dim
+dimStmt:    DIM ID '[' exp=expression ']' #Dim
             ;
 
-redimStmt:  REDIM ID '[' expression ']' #Redim
+redimStmt:  REDIM ID '[' exp=expression ']' #Redim
             ;
 
 logicalOp:  AND
@@ -83,7 +83,7 @@ expression: left=expression op=arithmeticOp right=expression #ArithmeticExpressi
             | NUMBER            #NumberExpression
             | STRING_LITERAL    #StringExpression
             | ID                 #IdExpression
-            | ID '[' expression ']' #ArrayAccessExpression
+            | ID '[' expr=expression ']' #ArrayAccessExpression
             ;
 
 functionCall: VAL '(' expr=expression ')'   #ValFunction
@@ -114,6 +114,7 @@ MOD:        'MOD' | 'mod' | '%';
 VAL:        'VAL' | 'val' ;
 LEN:        'LEN' | 'len' ;
 ISNAN:      'ISNAN' | 'isnan' ;
+REM:        'REM' | 'rem' ;
 DIM:        'DIM' | 'dim' ;
 REDIM:      'REDIM' | 'redim' ;
 
