@@ -298,7 +298,11 @@ class Visitor(ParseTreeVisitor):
 
         self.visit(ctx.cond)
 
-        self.add_instruction(f"ifeq {start_label}")
+        cond = self.visit(ctx.cond)
+        if cond is None:
+            self.add_instruction(f"ifeq {end_label}")
+        else:
+            self.add_instruction(f"{cond} {end_label}")
         self.add_instruction(f"{end_label}:")
 
     def visitContinue(self, ctx: MiniBParser.ContinueContext):
