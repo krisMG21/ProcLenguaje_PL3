@@ -12,6 +12,7 @@ class Visitor(ParseTreeVisitor):
         self.instructions = []
         self.instructions = []
         self.index_for = []
+
         self.label_count = 0
         self.current_var = 0
 
@@ -19,6 +20,7 @@ class Visitor(ParseTreeVisitor):
         self.local_limit = 100
 
         self.tabla = SymbolTable()
+        self.error = False
 
     def get_jasmin_code(self):
         header = f""".class public MiniB
@@ -53,7 +55,7 @@ class Visitor(ParseTreeVisitor):
         Estas se agregan al archivo final entre header y footer.
         """
         if function in self.functions:
-            print(f"Warning: función {function}")
+            print(f"WARNING: La función {function[:20]} ya definida")
 
     def add_instruction(self, instruction):
         """
