@@ -32,7 +32,7 @@ def main():
 
     if "c" in modes:
         jasmin_text = compile_source(file)
-        
+
         try:
             with open(output, "w") as f:
                 print("Guardando archivo en:", output)
@@ -66,13 +66,22 @@ def generate_visitor():
         print("Generating visitor for the grammar...")
         try:
             subprocess.run(
-                ["antlr4", "-Dlanguage=Python3", "-no-listener", "-visitor", grammar_file],
+                [
+                    "antlr4",
+                    "-Dlanguage=Python3",
+                    "-no-listener",
+                    "-visitor",
+                    grammar_file,
+                ],
                 check=True,
             )
             print("Visitor generated successfully.")
-            
+
             # Optionally, delete intermediate files if needed
-            intermediate_files = ["MiniBLexer.intermediate", "MiniBParser.intermediate"]  # Adjust as necessary
+            intermediate_files = [
+                "MiniBLexer.intermediate",
+                "MiniBParser.intermediate",
+            ]  # Adjust as necessary
             for file in intermediate_files:
                 if os.path.exists(file):
                     os.remove(file)
@@ -96,8 +105,8 @@ def compile_source(file):
     visitor: Visitor = Visitor()
     text: str = visitor.visit(tree)
     if visitor.error:
-            print("Error/es al compilar el código fuente.")
-            sys.exit(1)
+        print("Error/es al compilar el código fuente.")
+        sys.exit(1)
     return text
 
 

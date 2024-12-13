@@ -1,3 +1,3 @@
-rem PRINT VAL("123")
+REM PRINT VAL("123")
 PRINT LEN("12345")
-PRINT ISNAN(VAL("not a number"))
+REM PRINT ISNAN(VAL("not a number"))

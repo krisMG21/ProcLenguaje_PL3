@@ -264,6 +264,11 @@ class Visitor(ParseTreeVisitor):
 
         cond = self.visit(ctx.cond)
 
+        try:
+            exp = self.try_ID(ctx.cond.expr, 1)
+        except AttributeError:
+            pass
+
         if cond is None or cond == "":
             self.add_instruction(f"ifeq {else_label}")
         else:
