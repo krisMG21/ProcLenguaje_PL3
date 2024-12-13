@@ -55,7 +55,8 @@ class Visitor(ParseTreeVisitor):
         Estas se agregan al archivo final entre header y footer.
         """
         if function in self.functions:
-            print(f"WARNING: La función {function[:20]} ya definida")
+            name = function[21:].split(":")[0]
+            print(f"WARNING: La función {name}... ya esta definida")
 
     def add_instruction(self, instruction):
         """
@@ -78,7 +79,7 @@ class Visitor(ParseTreeVisitor):
 
     def load_var(self, var_index: int, var_value):
         """
-        Carga una variable en la pila.
+        Carga una variable en la pila con el tipo adecuado.
         """
         match var_value:
             case str() | None:
@@ -116,7 +117,10 @@ class Visitor(ParseTreeVisitor):
             self.load_var(var_index, var_value)
         except AttributeError:
             if load:
-                self.add_instruction(f"ldc {var_value}")
+                if isinstance(var_value, str) and '"' not in var_value[1:-1]:
+                    self.add_instruction(f"ldc {var_value}")
+                elif not isinstance(var_value, str):
+                    self.add_instruction(f"ldc {var_value}")
 
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         """
@@ -155,7 +159,9 @@ class Visitor(ParseTreeVisitor):
         var_name = ctx.ID().getText()
         var_value = self.visit(ctx.exp)
 
-        _ = self.tabla.mod(var_name, var_value)
+        var_index = self.tabla.mod(var_name, var_value)
+        self.try_ID(ctx.exp, var_value)
+        self.store_var(var_index, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
         """
@@ -165,10 +171,6 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
 
         value = self.visit(ctx.exp)
-        if value is str() and not value[1:-1].contains('"'):
-            self.add_instruction(f"ldc {value}")
-        elif value is not str():
-            self.add_instruction(f"ldc {value}")
 
         self.try_ID(ctx.exp, value, False)
 
@@ -305,8 +307,6 @@ class Visitor(ParseTreeVisitor):
 
         for stmt in ctx.statement():
             self.visit(stmt)
-
-        self.visit(ctx.cond)
 
         cond = self.visit(ctx.cond)
         if cond is None:
@@ -488,8 +488,6 @@ class Visitor(ParseTreeVisitor):
         var_name = ctx.ID().getText()
         _, var_value = self.tabla.get(var_name)
         # print("en id", var_name, var_value)
-        var_index, var_value = self.tabla.get(var_name)
-
         # self.load_var(var_index, var_value)
         return var_value
 

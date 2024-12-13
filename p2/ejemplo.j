@@ -21,37 +21,31 @@
     invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;
     getstatic java/lang/System/out Ljava/io/PrintStream;
     swap
-    ldc "1""2"
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 2.0
     fload_1
     fsub
-    ldc 2.0
     invokevirtual java/io/PrintStream/println(F)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 2.0
     ldc 3.3
     fmul
-    ldc 2.0
     invokevirtual java/io/PrintStream/println(F)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 4.0
     ldc 2.2
     fdiv
-    ldc 4.0
     invokevirtual java/io/PrintStream/println(F)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 7.0
     ldc 2.2
     fdiv
-    ldc 7.0
     invokevirtual java/io/PrintStream/println(F)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 5.3
     ldc 3.0
     frem
-    ldc 5.3
     invokevirtual java/io/PrintStream/println(F)V
     return
 .end method
