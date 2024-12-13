@@ -105,6 +105,7 @@ MOD:        'MOD' | 'mod' | '%';
 VAL:        'VAL' | 'val' ;
 LEN:        'LEN' | 'len' ;
 ISNAN:      'ISNAN' | 'isnan' ;
+REM:        'REM' | 'rem' ;
 
 LT:         '<' ;
 GT:         '>' ;
@@ -126,5 +127,5 @@ NUMBER: ('0x' [0-9a-fA-F]+ ('.' [0-9a-fA-F]+)?)
 
 STRING_LITERAL: '"' (~["\r\n])* '"';
 NEWLINE:    '\r'? '\n';
-COMMENT:    'REM' ~[\r\n]* NEWLINE -> skip;
+COMMENT:    ('REM' | 'rem') ~[ \r\n]* NEWLINE -> skip;
 WS:         [ \t]+ -> skip;

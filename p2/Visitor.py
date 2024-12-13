@@ -23,9 +23,11 @@ class Visitor(ParseTreeVisitor):
         self.error = False
 
     def get_jasmin_code(self):
-        header = f""".class public MiniB
+        header = """.class public MiniB
 .super java/lang/Object
 
+"""
+        main = f"""
 .method public static main([Ljava/lang/String;)V
     .limit stack {self.stack_limit}
     .limit locals {self.local_limit}
@@ -36,8 +38,9 @@ class Visitor(ParseTreeVisitor):
 """
         return (
             header
-            + "\n".join(self.imports)
             + "\n".join(self.functions)
+            + main
+            + "\n".join(self.imports)
             + "\n".join(self.instructions)
             + footer
         )
@@ -49,14 +52,24 @@ class Visitor(ParseTreeVisitor):
         """
         self.imports.append(f"    {import_}")
 
-    def add_function(self, function):
+    def def_function(self, function):
         """
-        Agrega una función a la lista de funciones.
+        Define una función a la lista de funciones.
         Estas se agregan al archivo final entre header y footer.
         """
         if function in self.functions:
             name = function[21:].split(":")[0]
             print(f"WARNING: La función {name}... ya esta definida")
+        else:
+            self.functions.append(function)
+
+    def add_function(self, function):
+        """
+        Agrega una función a la lista de funciones.
+            Estas se agregan al archivo final entre header y footer.
+        """
+        if function not in self.functions:
+            self.functions.append(function)
 
     def add_instruction(self, instruction):
         """
@@ -165,7 +178,7 @@ class Visitor(ParseTreeVisitor):
 
         is_op = False
         try:
-            is_op = bool(ctx.exp.op)
+            is_op = bool(ctx.exp.op or ctx.exp.func)
         except Exception:
             pass
 
@@ -183,7 +196,7 @@ class Visitor(ParseTreeVisitor):
 
         is_op = False
         try:
-            is_op = bool(ctx.exp.op)
+            is_op = bool(ctx.exp.op or ctx.exp.func)
         except Exception:
             pass
 
@@ -523,7 +536,9 @@ class Visitor(ParseTreeVisitor):
         self.add_function(VAL)
 
         self.try_ID(ctx.expr, value)
-        self.add_instruction("invokestatic MiniB/val")
+        self.add_instruction(
+            "invokestatic MiniB/val(Ljava/lang/String;)Ljava/lang/Integer;"
+        )
 
         try:
             value = int(value)
@@ -541,7 +556,7 @@ class Visitor(ParseTreeVisitor):
         self.add_function(LEN)
 
         self.try_ID(ctx.expr, value)
-        self.add_instruction("invokestatic MiniB/len()I")
+        self.add_instruction(".method public static len(Ljava/lang/String;)I")
         return len(value)
 
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
@@ -550,6 +565,6 @@ class Visitor(ParseTreeVisitor):
         self.add_function(ISNAN)
 
         self.try_ID(ctx.expr, value)
-        self.add_instruction("invokestatic MiniB/isNaN(Ljava/lang/Object;)I;")
+        self.add_instruction("invokestatic MiniB/len(Ljava/lang/Object;)I;")
 
         return 0
