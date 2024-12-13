@@ -1,5 +1,6 @@
 # Generated from MiniB.g4 by ANTLR 4.13.2
 from antlr4 import *
+
 if "." in __name__:
     from .MiniBParser import MiniBParser
 else:
@@ -7,167 +8,138 @@ else:
 
 # This class defines a complete generic visitor for a parse tree produced by MiniBParser.
 
+
 class MiniBVisitor(ParseTreeVisitor):
-
     # Visit a parse tree produced by MiniBParser#program.
-    def visitProgram(self, ctx:MiniBParser.ProgramContext):
+    def visitProgram(self, ctx: MiniBParser.ProgramContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#statement.
-    def visitStatement(self, ctx:MiniBParser.StatementContext):
+    def visitStatement(self, ctx: MiniBParser.StatementContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#Let.
-    def visitLet(self, ctx:MiniBParser.LetContext):
+    def visitLet(self, ctx: MiniBParser.LetContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#Op.
-    def visitOp(self, ctx:MiniBParser.OpContext):
+    def visitOp(self, ctx: MiniBParser.OpContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#Print.
-    def visitPrint(self, ctx:MiniBParser.PrintContext):
+    def visitPrint(self, ctx: MiniBParser.PrintContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#Input.
-    def visitInput(self, ctx:MiniBParser.InputContext):
+    def visitInput(self, ctx: MiniBParser.InputContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#If.
-    def visitIf(self, ctx:MiniBParser.IfContext):
+    def visitIf(self, ctx: MiniBParser.IfContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#For.
-    def visitFor(self, ctx:MiniBParser.ForContext):
+    def visitFor(self, ctx: MiniBParser.ForContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#While.
-    def visitWhile(self, ctx:MiniBParser.WhileContext):
+    def visitWhile(self, ctx: MiniBParser.WhileContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#Repeat.
-    def visitRepeat(self, ctx:MiniBParser.RepeatContext):
+    def visitRepeat(self, ctx: MiniBParser.RepeatContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#Continue.
-    def visitContinue(self, ctx:MiniBParser.ContinueContext):
+    def visitContinue(self, ctx: MiniBParser.ContinueContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#Exit.
-    def visitExit(self, ctx:MiniBParser.ExitContext):
+    def visitExit(self, ctx: MiniBParser.ExitContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#logicalOp.
-    def visitLogicalOp(self, ctx:MiniBParser.LogicalOpContext):
+    def visitLogicalOp(self, ctx: MiniBParser.LogicalOpContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#comparisonOp.
-    def visitComparisonOp(self, ctx:MiniBParser.ComparisonOpContext):
+    def visitComparisonOp(self, ctx: MiniBParser.ComparisonOpContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#PlusOperation.
-    def visitPlusOperation(self, ctx:MiniBParser.PlusOperationContext):
+    def visitPlusOperation(self, ctx: MiniBParser.PlusOperationContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#MinusOperation.
-    def visitMinusOperation(self, ctx:MiniBParser.MinusOperationContext):
+    def visitMinusOperation(self, ctx: MiniBParser.MinusOperationContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#MulOperation.
-    def visitMulOperation(self, ctx:MiniBParser.MulOperationContext):
+    def visitMulOperation(self, ctx: MiniBParser.MulOperationContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#DivOperation.
-    def visitDivOperation(self, ctx:MiniBParser.DivOperationContext):
+    def visitDivOperation(self, ctx: MiniBParser.DivOperationContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#ModOperation.
-    def visitModOperation(self, ctx:MiniBParser.ModOperationContext):
+    def visitModOperation(self, ctx: MiniBParser.ModOperationContext):
         return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by MiniBParser#Not.
-    def visitNot(self, ctx:MiniBParser.NotContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by MiniBParser#condExp.
-    def visitCondExp(self, ctx:MiniBParser.CondExpContext):
-        return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#Comparison.
-    def visitComparison(self, ctx:MiniBParser.ComparisonContext):
+    def visitComparison(self, ctx: MiniBParser.ComparisonContext):
         return self.visitChildren(ctx)
 
+    # Visit a parse tree produced by MiniBParser#Not.
+    def visitNot(self, ctx: MiniBParser.NotContext):
+        return self.visitChildren(ctx)
 
     # Visit a parse tree produced by MiniBParser#Logical.
-    def visitLogical(self, ctx:MiniBParser.LogicalContext):
+    def visitLogical(self, ctx: MiniBParser.LogicalContext):
         return self.visitChildren(ctx)
 
+    # Visit a parse tree produced by MiniBParser#condExp.
+    def visitCondExp(self, ctx: MiniBParser.CondExpContext):
+        return self.visitChildren(ctx)
 
     # Visit a parse tree produced by MiniBParser#StringExpression.
-    def visitStringExpression(self, ctx:MiniBParser.StringExpressionContext):
+    def visitStringExpression(self, ctx: MiniBParser.StringExpressionContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#IdExpression.
-    def visitIdExpression(self, ctx:MiniBParser.IdExpressionContext):
+    def visitIdExpression(self, ctx: MiniBParser.IdExpressionContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#ParenExpression.
-    def visitParenExpression(self, ctx:MiniBParser.ParenExpressionContext):
+    def visitParenExpression(self, ctx: MiniBParser.ParenExpressionContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#NumberExpression.
-    def visitNumberExpression(self, ctx:MiniBParser.NumberExpressionContext):
+    def visitNumberExpression(self, ctx: MiniBParser.NumberExpressionContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#ArithmeticExpression.
-    def visitArithmeticExpression(self, ctx:MiniBParser.ArithmeticExpressionContext):
+    def visitArithmeticExpression(self, ctx: MiniBParser.ArithmeticExpressionContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#FunctionCallExpression.
-    def visitFunctionCallExpression(self, ctx:MiniBParser.FunctionCallExpressionContext):
+    def visitFunctionCallExpression(
+        self, ctx: MiniBParser.FunctionCallExpressionContext
+    ):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#ValFunction.
-    def visitValFunction(self, ctx:MiniBParser.ValFunctionContext):
+    def visitValFunction(self, ctx: MiniBParser.ValFunctionContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#LenFunction.
-    def visitLenFunction(self, ctx:MiniBParser.LenFunctionContext):
+    def visitLenFunction(self, ctx: MiniBParser.LenFunctionContext):
         return self.visitChildren(ctx)
-
 
     # Visit a parse tree produced by MiniBParser#IsNanFunction.
-    def visitIsNanFunction(self, ctx:MiniBParser.IsNanFunctionContext):
+    def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
         return self.visitChildren(ctx)
-
 
 
 del MiniBParser
+

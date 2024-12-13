@@ -4,31 +4,17 @@
 .method public static main([Ljava/lang/String;)V
     .limit stack 100
     .limit locals 100
-    ldc 5
-    istore_0
-    ldc 10
-    istore_1
-    ldc 15
-    istore_2
-    iload_0
-    iload_1
-    iload_1
-    iload_2
-    iand
-    iload_2
-    ldc 10
-    iconst_1
-    ixor
-    ior
-    ifeq ELSE_0
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "Condition met"
-    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
-    goto ENDIF_0
-    ELSE_0:
+    ldc "Name: "
+    invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
+    new java/util/Scanner
+    dup
+    getstatic java/lang/System/in Ljava/io/InputStream;
+    invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V
+    invokevirtual java/util/Scanner/nextLine()Ljava/lang/String;
+    astore_0
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "Condition not met"
+    aload_0
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
-    ENDIF_0:
     return
 .end method

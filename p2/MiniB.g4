@@ -17,7 +17,7 @@ statement:  letStmt
 letStmt:    LET ID '=' exp=expression #Let
             ;
 
-opStmt:     ID '=' exp=expression #Op
+opStmt:     ID '=' (exp=expression | cond=condition) #Op
             ;
 
 printStmt:  PRINT exp=expression #Print
@@ -65,7 +65,7 @@ arithmeticOp: PLUS  #PlusOperation
 
 condition:  left=expression op=comparisonOp right=expression #Comparison
             | NOT cond=condition #Not
-            | left=condition op=logicalOp right=condition #Logical
+            | left=expression op=logicalOp right=condition #Logical
             | expr=expression #condExp
             ;
 
