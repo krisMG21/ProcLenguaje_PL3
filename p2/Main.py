@@ -34,9 +34,13 @@ def main():
         if error:
             print("Error/es al compilar el código fuente.")
             sys.exit(1)
-        with open(output, "w") as f:
-            print("Guardando archivo en:", output)
-            f.write(jasmin_text)
+        try:
+            with open(output, "w") as f:
+                print("Guardando archivo en:", output)
+                f.write(jasmin_text)
+        except Exception:
+            print("Error al guardar el archivo.")
+            sys.exit(1)
 
         compile_to_bytecode(output)
 
