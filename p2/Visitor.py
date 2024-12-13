@@ -36,15 +36,27 @@ class Visitor(ParseTreeVisitor):
     return
 .end method
 """
-        return header + "\n".join(self.instructions) + footer
+        return (
+            header
+            + "\n".join(self.imports)
+            + "\n".join(self.functions)
+            + "\n".join(self.instructions)
+            + footer
+        )
 
     def add_import(self, import_):
         """
         Agrega una instrucción de importación a la lista de instrucciones.
         Estas se agregan al archivo final entre header y footer.
         """
-        if import_ in self.imports:
-            self.imports.append(import_)
+        self.imports.append(f"    {import_}")
+
+    def add_function(self, function):
+        """
+        Agrega una función a la lista de funciones.
+        Estas se agregan al archivo final entre header y footer.
+        """
+        self.functions.append(function)
 
     def add_instruction(self, instruction):
         """
@@ -102,7 +114,6 @@ class Visitor(ParseTreeVisitor):
         try:
             var_name = exp.ID().getText()
             var_index, _ = self.tabla.get(var_name)
-            print("load: ", var_index, var_value)
             self.load_var(var_index, var_value)
         except AttributeError:
             self.add_instruction(f"ldc {var_value}")
@@ -504,15 +515,27 @@ class Visitor(ParseTreeVisitor):
         """
         Calcula la longitud de un valor dado
         """
-        value = self.visit(ctx.expression())
-        self.try_ID(ctx.expr, value)
+        value = self.visit(ctx.expr)
 
-        # Get length of the value
+        self.add_function("""
+    .method public static length()I
+        .limit stack 1
+        .limit locals 0
+
+        ; El String ya está en la cima de la pila
+        invokevirtual java/lang/String/length()I
+
+        ; Retorna el resultado (que ya está en la pila)
+        ireturn
+    .end method
+        """)
+
+        self.try_ID(ctx.expr, value)
+        self.add_instruction("invokestatic MiniB/length()I")
         return len(value)
 
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
-        # Simplified: ISNAN function always returns false (0)
         value = self.visit(ctx.expr)
-
         self.try_ID(ctx.expr, value)
+
         return 0
