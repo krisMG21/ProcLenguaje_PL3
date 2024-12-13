@@ -117,9 +117,11 @@ class Visitor(ParseTreeVisitor):
             self.load_var(var_index, var_value)
         except AttributeError:
             if load:
-                if isinstance(var_value, str) and '"' not in var_value[1:-1]:
-                    self.add_instruction(f"ldc {var_value}")
-                elif not isinstance(var_value, str):
+                if (
+                    isinstance(var_value, str)
+                    and '"' not in var_value[1:-1]
+                    or not isinstance(var_value, str)
+                ):
                     self.add_instruction(f"ldc {var_value}")
 
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
@@ -160,7 +162,14 @@ class Visitor(ParseTreeVisitor):
         var_value = self.visit(ctx.exp)
 
         var_index = self.tabla.mod(var_name, var_value)
-        self.try_ID(ctx.exp, var_value)
+
+        is_op = False
+        try:
+            is_op = bool(ctx.exp.op)
+        except Exception:
+            pass
+
+        self.try_ID(ctx.exp, var_value, not is_op)
         self.store_var(var_index, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
@@ -244,7 +253,7 @@ class Visitor(ParseTreeVisitor):
         for stmt in ctx.statif.getChildren():
             self.visit(stmt)
 
-        self.add_instruction(f"goto {end_label}")
+        self.add_instruction(f"goto {end_label}")  # Salta al final
         self.add_instruction(f"{else_label}:")
 
         if ctx.statelse:
@@ -315,12 +324,9 @@ class Visitor(ParseTreeVisitor):
 
         cond = self.visit(ctx.cond)
         if cond is None or cond == "":
-            self.add_instruction(f"ifeq {end_label}")
+            self.add_instruction(f"ifeq {start_label}")
         else:
-            self.add_instruction(f"{cond} {end_label}")
-
-        self.add_instruction(f"goto {start_label}")
-        self.add_instruction(f"{end_label}:")
+            self.add_instruction(f"{cond} {start_label}")
 
     def visitContinue(self, ctx: MiniBParser.ContinueContext):
         # This is a simplified version, actual implementation depends on loop context
