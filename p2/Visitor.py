@@ -515,6 +515,8 @@ class Visitor(ParseTreeVisitor):
 
     def visitValFunction(self, ctx: MiniBParser.ValFunctionContext):
         value = self.visit(ctx.expression())
+        if isinstance(value, str): value = value[1:-1]
+
         try:
             value = int(value)
         except Exception:
@@ -528,11 +530,19 @@ class Visitor(ParseTreeVisitor):
         Calcula la longitud de un valor dado
         """
         value = self.visit(ctx.expression())
+        if isinstance(value, str): value = value[1:-1]
 
+        try:
+            var_name = ctx.right.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            print("load: ", var_index, value)
+            self.load_var(var_index, len(value))
+        except AttributeError:
+            pass
         # Get length of the value
-        self.add_instruction("invokestatic java/lang/String.length()I")
         return len(value)
 
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
         # Simplified: ISNAN function always returns false (0)
+        
         return 0

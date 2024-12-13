@@ -5,6 +5,7 @@
     .limit stack 100
     .limit locals 100
     ldc 1
+    ldc 1
     istore_0
     FOR_START_0:
     iload_0
