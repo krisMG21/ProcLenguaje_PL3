@@ -236,7 +236,7 @@ class Visitor(ParseTreeVisitor):
 
         cond = self.visit(ctx.cond)
 
-        if cond is None:
+        if cond is None or cond == "":
             self.add_instruction(f"ifeq {else_label}")
         else:
             self.add_instruction(f"{cond} {else_label}")
@@ -292,7 +292,7 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"{start_label}:")
         cond = self.visit(ctx.cond)
 
-        if cond is None:
+        if cond is None or cond == "":
             self.add_instruction(f"ifeq {end_label}")
         else:
             self.add_instruction(f"{cond} {end_label}")
@@ -314,10 +314,12 @@ class Visitor(ParseTreeVisitor):
             self.visit(stmt)
 
         cond = self.visit(ctx.cond)
-        if cond is None:
+        if cond is None or cond == "":
             self.add_instruction(f"ifeq {end_label}")
         else:
             self.add_instruction(f"{cond} {end_label}")
+
+        self.add_instruction(f"goto {start_label}")
         self.add_instruction(f"{end_label}:")
 
     def visitContinue(self, ctx: MiniBParser.ContinueContext):
@@ -349,7 +351,7 @@ class Visitor(ParseTreeVisitor):
             comp = "if_icmpgt"
         elif op == ">=":
             comp = "if_icmplt"
-        elif op == "==":
+        elif op == "=":
             comp = "if_icmpne"
         elif op == "!=":
             comp = "if_icmpeq"
@@ -376,7 +378,12 @@ class Visitor(ParseTreeVisitor):
 
     def visitCondExp(self, ctx: MiniBParser.CondExpContext):
         val = self.visit(ctx.expr)
-        self.add_instruction(f"ldc {val}")
+
+        is_op = False
+        try:
+            is_op = bool(ctx.expr.op)
+        except Exception:
+            pass
 
     def visitArithmeticExpression(self, ctx: MiniBParser.ArithmeticExpressionContext):
         val0 = self.visit(ctx.expression(0))

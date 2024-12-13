@@ -76,7 +76,11 @@ def compile_to_bytecode(jasmin_file):
         subprocess.run(["java", "-jar", "jasmin.jar", jasmin_file], check=True)
         print("Bytecode generado con éxito.")
     except subprocess.CalledProcessError as e:
-        print("Error al compilar a bytecode:", e)
+        print("Error de proceso al compilar a bytecode:", e)
+        sys.exit(1)
+    except Exception:
+        print("Error de compilación, abortando...")
+        sys.exit(1)
 
 
 def execute_program():
