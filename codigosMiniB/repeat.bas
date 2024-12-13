@@ -1,3 +1,5 @@
 LET i = 1
-i = i + 1
-PRINT i
+REPEAT
+    PRINT i
+    i = i + 1
+UNTIL i = 5
