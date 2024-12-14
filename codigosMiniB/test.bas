@@ -1,5 +1,2 @@
-DIM numbers[3]
-FOR i = 0 TO 2
-    PRINT i
-NEXT 
-REDIM numbers[5]
+LET x = "5"
+PRINT x-2

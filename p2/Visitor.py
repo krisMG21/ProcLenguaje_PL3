@@ -443,26 +443,55 @@ class Visitor(ParseTreeVisitor):
         val0 = 0 if val0 is None else val0
         val1 = 0 if val1 is None else val1
 
+        # Manejo especial para convertir strings a números si es posible
+        var_index_0 = None
+        var_index_1 = None
+
+        if isinstance(val0, str) and not isinstance(val1, str):
+            try:
+                raw_val0 = val0.strip('"')  # Elimina las comillas externas
+                val0 = int(raw_val0) if '.' not in raw_val0 else float(raw_val0)
+                var_name_0 = ctx.expression(0).getText()
+                var_index_0 = self.tabla.add(f"{var_name_0}_num", val0)  # Asignar nueva posición
+                self.add_instruction(f"ldc {val0}")  # Cargar el valor convertido
+                self.store_var(var_index_0, val0)  # Guardar el valor convertido
+            except ValueError:
+                raise TypeError(f"Operación no válida: no se puede convertir '{val0}' a número.")
+        elif isinstance(val1, str) and not isinstance(val0, str):
+            try:
+                raw_val1 = val1.strip('"')  # Elimina las comillas externas
+                val1 = int(raw_val1) if '.' not in raw_val1 else float(raw_val1)
+                var_name_1 = ctx.expression(1).getText()
+                var_index_1 = self.tabla.add(f"{var_name_1}_num", val1)  # Asignar nueva posición
+                self.add_instruction(f"ldc {val1}")  # Cargar el valor convertido
+                self.store_var(var_index_1, val1)  # Guardar el valor convertido
+            except ValueError:
+                raise TypeError(f"Operación no válida: no se puede convertir '{val1}' a número.")
+        elif isinstance(val0, str) and isinstance(val1, str):
+            return self.concat(val0, val1)
+
         # Contagio de tipo
         if isinstance(val1, float) and isinstance(val0, int):
             val0 = float(val0)
         elif isinstance(val0, float) and isinstance(val1, int):
             val1 = float(val1)
-        elif isinstance(val0, str) or isinstance(val1, str):
-            val0, val1 = str(val0), str(val1)
-            val0 = '"' + val0 + '"' if not val0.startswith('"') else val0
-            val1 = '"' + val1 + '"' if not val1.startswith('"') else val1
 
-        if type(val0) is str and type(val1) is str:
-            val0 = self.concat(val0, val1)
-            return val0
+        # Referencias consistentes a los índices de variables locales
+        if var_index_0 is not None:
+            self.add_instruction(f"iload_{var_index_0}")
+        else:
+            self.try_ID(ctx.expression(0), val0)
 
-        self.try_ID(ctx.left, val0)
-        self.try_ID(ctx.right, val1)
+        if var_index_1 is not None:
+            self.add_instruction(f"iload_{var_index_1}")
+        else:
+            self.try_ID(ctx.expression(1), val1)
 
+        # Generar la operación
         op = self.visit(ctx.op)
         instr = ""
 
+        # Determinar las instrucciones basadas en el tipo
         match val0:
             case int() | bool():
                 val0 = int(val0)
@@ -484,9 +513,13 @@ class Visitor(ParseTreeVisitor):
             case "%":
                 instr += "rem"
 
+        # Agregar la instrucción final
         self.add_instruction(instr)
 
         return val0
+
+
+
 
     def visitPlusOperation(self, ctx: MiniBParser.PlusOperationContext):
         return "+"
