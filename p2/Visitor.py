@@ -643,8 +643,8 @@ class Visitor(ParseTreeVisitor):
         2. Crear el array con 'newarray int'
         3. Guardar en la tabla de símbolos y almacenar en locals con 'astore_x'
         """
-        var_name = ctx.ID().getText()
-        size = self.visit(ctx.exp)  # Calcula la dimensión
+        var_name = ctx.ID().getText()  # Nombre de la variable
+        size = self.visit(ctx.exp)  # Calcula la dimensión del array
 
         # Cargar el tamaño en la pila
         self.add_instruction(f"ldc {size}")
@@ -652,17 +652,15 @@ class Visitor(ParseTreeVisitor):
         # Crear un array de enteros
         self.add_instruction("newarray int")
 
-        # Añadir o modificar la variable en la tabla con el tamaño
-        # Si la variable no existe, add; si ya existe (como un redim), mod.
         try:
-            var_index, _ = self.tabla.get(var_name)
-            # Si llega aquí, significa que la variable existe
-            var_index = self.tabla.mod(var_name, size)
-        except Exception:
-            # Si lanza error es que no existe, entonces la creamos
+            # Añadir la variable a la tabla de símbolos
             var_index = self.tabla.add(var_name, size)
+        except KeyError as e:
+            print(f"Error al agregar variable a la tabla de símbolos: {e}")
+            self.error = True
+            return
 
-        # Guardamos la referencia del array en un local
+        # Guardar la referencia del array en un local
         self.add_instruction(f"astore_{var_index}")
 
     def visitArrayOp(self, ctx: MiniBParser.ArrayOpContext):
@@ -714,94 +712,76 @@ class Visitor(ParseTreeVisitor):
         return None
 
     def visitRedim(self, ctx: MiniBParser.RedimContext):
-        # Obtener el nombre del array y su tamaño actual
         var_name = ctx.ID().getText()
         old_var_index, old_size = self.tabla.get(var_name)
 
-        # Obtener el nuevo tamaño
         new_size = self.visit(ctx.exp)
-        # Carga el nuevo tamaño en la pila
+        if not isinstance(new_size, int):
+            raise ValueError("El tamaño de REDIM debe ser un entero.")
+
+        # Crear el nuevo array temporal
         self.add_instruction(f"ldc {new_size}")
-        # Crea el array temporal (var_name_redim)
-        temp_name = var_name + "Redim"
+        temp_name = f"{var_name}_Redim"
         temp_var_index = self.tabla.add(temp_name, new_size)
         self.add_instruction("newarray int")
         self.add_instruction(f"astore_{temp_var_index}")
 
-        # Determinar el minimo entre old_size y new_size
         min_size = min(old_size, new_size)
 
-        # PRIMER BUCLE: Copiar desde var_name (viejo) a var_nameRedim (temp)
-        # Estructura equivalente a:
-        # for i = 0 to min_size-1:
-        #   var_nameRedim[i] = var_name[i]
-
-        # i = 0
-        i_index = self.tabla.add("$i_loop_redim_1", 0)
+        # Bucle 1: Copiar del array viejo al temporal
+        i_index = self.tabla.add(f"$i_loop_redim_{self.label_count}_1", 0)
         self.add_instruction("iconst_0")
         self.add_instruction(f"istore_{i_index}")
 
+        self.index_for.append(self.label_count)
         start_label_1 = f"FOR_START_{self.label_count}"
         continue_label_1 = f"FOR_CONTINUE_{self.label_count}"
         end_label_1 = f"FOR_END_{self.label_count}"
         self.label_count += 1
-
-        self.instructions.append(f"{start_label_1}:")
-        # if i > min_size-1 goto end
+        # Generar bucle
+        self.add_instruction(f"{start_label_1}:")
         self.add_instruction(f"iload_{i_index}")
         self.add_instruction(f"ldc {min_size - 1}")
         self.add_instruction(f"if_icmpgt {end_label_1}")
 
-        # var_nameRedim[i] = var_name[i]
-        # cargar var_nameRedim
+        # Copiar valor
         self.add_instruction(f"aload_{temp_var_index}")
-        # cargar i
         self.add_instruction(f"iload_{i_index}")
-        # cargar var_name
         self.add_instruction(f"aload_{old_var_index}")
-        # cargar i
         self.add_instruction(f"iload_{i_index}")
-        # iaload
         self.add_instruction("iaload")
-        # iastore
         self.add_instruction("iastore")
 
-        self.instructions.append(f"{continue_label_1}:")
+        self.add_instruction(f"{continue_label_1}:")
         self.add_instruction(f"iinc {i_index} 1")
         self.add_instruction(f"goto {start_label_1}")
-        self.instructions.append(f"{end_label_1}:")
-
-        # Ahora redimensionamos var_name
-        # DIM var_name[new_size]
-        # Esto es equivalente a volver a declarar el array
+        self.add_instruction(f"{end_label_1}:")
+        self.index_for.pop()
+        # Redimensionar el array original
         self.add_instruction(f"ldc {new_size}")
         self.add_instruction("newarray int")
-        # En vez de add, usamos mod, porque la variable ya existe
         self.tabla.mod(var_name, new_size)
-        # var_name tiene el mismo var_index
         self.add_instruction(f"astore_{old_var_index}")
 
-        # SEGUNDO BUCLE: Copiar desde var_nameRedim a var_name (nuevo)
-        # for i = 0 to new_size-1:
-        #   var_name[i] = var_nameRedim[i]
-
-        # i = 0 (reutilizamos el mismo i_loop o creamos uno nuevo)
-        i2_index = self.tabla.add("$i_loop_redim_2", 0)
+        # Bucle 2: Copiar del temporal al array redimensionado
+        i2_index = self.tabla.add(f"$i_loop_redim_{self.label_count}_2", 0)
         self.add_instruction("iconst_0")
         self.add_instruction(f"istore_{i2_index}")
 
+        self.index_for.append(self.label_count)
         start_label_2 = f"FOR_START_{self.label_count}"
         continue_label_2 = f"FOR_CONTINUE_{self.label_count}"
         end_label_2 = f"FOR_END_{self.label_count}"
         self.label_count += 1
 
-        self.instructions.append(f"{start_label_2}:")
-        # if i > new_size-1 goto end
+        # Generar bucle
+        self.add_instruction(f"{start_label_2}:")
         self.add_instruction(f"iload_{i2_index}")
-        self.add_instruction(f"ldc {new_size - 1}")
+        self.add_instruction(f"ldc {min_size - 1}")
         self.add_instruction(f"if_icmpgt {end_label_2}")
+        self.index_for.pop()
 
-        # var_name[i] = var_nameRedim[i]
+        # Copiar valor
         self.add_instruction(f"aload_{old_var_index}")
         self.add_instruction(f"iload_{i2_index}")
         self.add_instruction(f"aload_{temp_var_index}")
@@ -809,7 +789,10 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("iaload")
         self.add_instruction("iastore")
 
-        self.instructions.append(f"{continue_label_2}:")
+        self.add_instruction(f"{continue_label_2}:")
         self.add_instruction(f"iinc {i2_index} 1")
         self.add_instruction(f"goto {start_label_2}")
-        self.instructions.append(f"{end_label_2}:")
+        self.add_instruction(f"{end_label_2}:")
+
+
+
