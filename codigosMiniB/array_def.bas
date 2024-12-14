@@ -1,4 +1,3 @@
+DIM numbers[5]
+numbers[0] = "Hello"
 
-DIM numbers[3]
-numbers[0] = 2*3
-PRINT numbers[0]

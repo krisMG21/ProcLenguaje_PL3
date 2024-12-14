@@ -599,47 +599,46 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"ldc {size}")
 
         # Crear un array de enteros
-        # Opciones: newarray <atype> donde <atype> para int es 'int'
-        # atype (Tipos primitivos): T_BOOLEAN=4, T_CHAR=5, T_FLOAT=6, T_DOUBLE=7, T_BYTE=8, T_SHORT=9, T_INT=10, T_LONG=11
-        # Para int:
         self.add_instruction("newarray int")
 
-        # Añadimos la variable a la tabla de símbolos
-        # Asumimos que se guardará el array como tipo 'list()' o None. Aquí lo dejamos como None.
-        var_index = self.tabla.add(var_name, None)
+        # Añadir o modificar la variable en la tabla con el tamaño
+        # Si la variable no existe, add; si ya existe (como un redim), mod.
+        try:
+            var_index, _ = self.tabla.get(var_name)
+            # Si llega aquí, significa que la variable existe
+            var_index = self.tabla.mod(var_name, size)
+        except:
+            # Si lanza error es que no existe, entonces la creamos
+            var_index = self.tabla.add(var_name, size)
 
         # Guardamos la referencia del array en un local
         self.add_instruction(f"astore_{var_index}")
 
     def visitArrayOp(self, ctx: MiniBParser.ArrayOpContext):
         var_name = ctx.ID().getText()
-        var_index, _ = self.tabla.get(var_name)
+        var_index, array_size = self.tabla.get(var_name)  # Ahora array_size es el tamaño del array
 
         # Cargar la referencia del array
-        self.add_instruction(f"aload_{var_index}")  # stack: [arrayref]
+        self.add_instruction(f"aload_{var_index}")
 
         # Cargar el índice
         index_value = self.visit(ctx.exp1)
-        # Si el índice no es una operación aritmética o acceso a array (que ya pone valor en pila),
-        # llamamos a try_ID
         if not isinstance(ctx.exp1, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.exp1, MiniBParser.ArrayAccessExpressionContext):
             self.try_ID(ctx.exp1, index_value)
 
         # Cargar el valor a asignar
         if ctx.exp2:
             value = self.visit(ctx.exp2)
-            # Igual que con el índice, si exp2 NO es aritmética ni acceso a array, usar try_ID
             if not isinstance(ctx.exp2, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.exp2, MiniBParser.ArrayAccessExpressionContext):
                 self.try_ID(ctx.exp2, value)
         else:
             value = self.visit(ctx.cond)
-            # Si es una condición simple, probablemente necesites el try_ID, salvo que sea aritmética o array
             if not isinstance(ctx.cond, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.cond, MiniBParser.ArrayAccessExpressionContext):
                 self.try_ID(ctx.cond, value)
 
-        # stack: [arrayref, index, value]
-
+        # Ahora: stack = [arrayref, index, value]
         self.add_instruction("iastore")
+
 
 
 
@@ -647,132 +646,117 @@ class Visitor(ParseTreeVisitor):
         
     def visitArrayAccessExpression(self, ctx: MiniBParser.ArrayAccessExpressionContext):
         var_name = ctx.ID().getText()
-        var_index, _ = self.tabla.get(var_name)
+        var_index, array_size = self.tabla.get(var_name)  # obtener también el tamaño
 
         # Cargar la referencia del array
-        self.add_instruction(f"aload_{var_index}")  # stack: [arrayref]
+        self.add_instruction(f"aload_{var_index}")
 
         # Evaluar y cargar el índice
         index_value = self.visit(ctx.expr)
         self.try_ID(ctx.expr, index_value)
-        # stack: [arrayref, index]
 
-        # Cargar el valor del array
-        self.add_instruction("iaload")
-        # stack: [value]
-
+        # stack = [arrayref, index]
+        self.add_instruction("iaload")  # Carga el valor del array en la pila
         return None
 
+
     def visitRedim(self, ctx: MiniBParser.RedimContext):
-        """
-        Redimensiona un array existente:
-        1. Guarda el array antiguo en una variable temporal.
-        2. Obtiene longitudes.
-        3. Crea el nuevo array.
-        4. Copia los elementos uno a uno hasta el minimo.
-        """
-
+        # Obtener el nombre del array y su tamaño actual
         var_name = ctx.ID().getText()
-        var_index, _ = self.tabla.get(var_name)
+        old_var_index, old_size = self.tabla.get(var_name)
 
-        # Visitar la expresión de la nueva dimensión
+        # Obtener el nuevo tamaño
         new_size = self.visit(ctx.exp)
-        self.try_ID(ctx.exp, new_size)
-
-        # Necesitamos variables locales temporales:
-        # temp_array_index = siguiente local libre
-        # old_length_index = siguiente local libre
-        # new_length_index = siguiente local libre
-        # loop_index = siguiente local libre
-        # min_length_index = siguiente local libre
-
-        # Suponiendo que cada add en la tabla suma uno, y que las variables se añadieron en orden,
-        # podemos asignar índices extra manualmente. Por simplicidad, supongamos:
-        temp_array_index = self.tabla.add("$temp_old_array", None)
-        old_length_index = self.tabla.add("$old_length", 0)
-        new_length_index = self.tabla.add("$new_length", 0)
-        min_length_index = self.tabla.add("$min_length", 0)
-        loop_index = self.tabla.add("$i_loop", 0)
-
-        # 1. Guardar el array original en temp
-        self.add_instruction(f"aload_{var_index}")         # cargar array antiguo
-        self.add_instruction(f"astore_{temp_array_index}") # temp = old_array
-
-        # 2. Obtener su longitud
-        self.add_instruction(f"aload_{temp_array_index}")
-        self.add_instruction("arraylength")
-        self.add_instruction(f"istore_{old_length_index}")
-
-        # 3. Guardar el new_size en una variable local
-        # En este punto la pila tiene new_size por el try_ID
-        # Si no está en la pila, haz un ldc:
-        # Si new_size es int (lo normal), ya lo has cargado con try_ID (ldc x).
-        # Así que:
-        # (En caso de no tenerlo en pila, harías: self.add_instruction(f"ldc {new_size}"))
+        # Carga el nuevo tamaño en la pila
         self.add_instruction(f"ldc {new_size}")
-        self.add_instruction(f"istore_{new_length_index}")
-
-        # 4. Crear el nuevo array con el new_size
-        self.add_instruction(f"iload_{new_length_index}")
+        # Crea el array temporal (var_name_redim)
+        temp_name = var_name + "Redim"
+        temp_var_index = self.tabla.add(temp_name, new_size)
         self.add_instruction("newarray int")
-        self.add_instruction(f"astore_{var_index}")
+        self.add_instruction(f"astore_{temp_var_index}")
 
-        # 5. Determinar el mínimo entre old_length y new_length
-        # if (old_length <= new_length) min = old_length else min = new_length
-        label_less_equal = f"MIN_LE_{self.label_count}"
-        label_end_min = f"MIN_END_{self.label_count}"
-        self.label_count += 1
+        # Determinar el minimo entre old_size y new_size
+        min_size = min(old_size, new_size)
 
-        self.add_instruction(f"iload_{old_length_index}")
-        self.add_instruction(f"iload_{new_length_index}")
-        self.add_instruction(f"if_icmple {label_less_equal}")  # if old_length <= new_length -> goto label_less_equal
-
-        # else:
-        self.add_instruction(f"iload_{new_length_index}")
-        self.add_instruction(f"istore_{min_length_index}")
-        self.add_instruction(f"goto {label_end_min}")
-
-        # then:
-        self.add_instruction(f"{label_less_equal}:")
-        self.add_instruction(f"iload_{old_length_index}")
-        self.add_instruction(f"istore_{min_length_index}")
-
-        self.add_instruction(f"{label_end_min}:")
-
-        # 6. Copiar elemento a elemento
-        # for (i = 0; i < min_length; i++):
-        start_label = f"COPY_START_{self.label_count}"
-        end_label = f"COPY_END_{self.label_count}"
-        self.label_count += 1
+        # PRIMER BUCLE: Copiar desde var_name (viejo) a var_nameRedim (temp)
+        # Estructura equivalente a:
+        # for i = 0 to min_size-1:
+        #   var_nameRedim[i] = var_name[i]
 
         # i = 0
-        self.add_instruction(f"iconst_0")
-        self.add_instruction(f"istore_{loop_index}")
+        i_index = self.tabla.add("$i_loop_redim_1", 0)
+        self.add_instruction("iconst_0")
+        self.add_instruction(f"istore_{i_index}")
 
-        self.add_instruction(f"{start_label}:")
+        start_label_1 = f"FOR_START_{self.label_count}"
+        continue_label_1 = f"FOR_CONTINUE_{self.label_count}"
+        end_label_1 = f"FOR_END_{self.label_count}"
+        self.label_count += 1
 
-        # if i >= min_length goto end
-        self.add_instruction(f"iload_{loop_index}")
-        self.add_instruction(f"iload_{min_length_index}")
-        self.add_instruction(f"if_icmpge {end_label}")
+        self.instructions.append(f"{start_label_1}:")
+        # if i > min_size-1 goto end
+        self.add_instruction(f"iload_{i_index}")
+        self.add_instruction(f"ldc {min_size - 1}")
+        self.add_instruction(f"if_icmpgt {end_label_1}")
 
-        # cargar old array
-        self.add_instruction(f"aload_{var_index}")          # new arrayref
-        self.add_instruction(f"iload_{loop_index}")         # index en new array
+        # var_nameRedim[i] = var_name[i]
+        # cargar var_nameRedim
+        self.add_instruction(f"aload_{temp_var_index}")
+        # cargar i
+        self.add_instruction(f"iload_{i_index}")
+        # cargar var_name
+        self.add_instruction(f"aload_{old_var_index}")
+        # cargar i
+        self.add_instruction(f"iload_{i_index}")
+        # iaload
+        self.add_instruction("iaload")
+        # iastore
+        self.add_instruction("iastore")
 
-        self.add_instruction(f"aload_{temp_array_index}")    # old arrayref
-        self.add_instruction(f"iload_{loop_index}")          # index en old array
-        self.add_instruction("iaload")                       # valor old_array[i]
+        self.instructions.append(f"{continue_label_1}:")
+        self.add_instruction(f"iinc {i_index} 1")
+        self.add_instruction(f"goto {start_label_1}")
+        self.instructions.append(f"{end_label_1}:")
 
-        self.add_instruction("iastore")                      # new_array[i] = old_array[i]
+        # Ahora redimensionamos var_name
+        # DIM var_name[new_size]
+        # Esto es equivalente a volver a declarar el array
+        self.add_instruction(f"ldc {new_size}")
+        self.add_instruction("newarray int")
+        # En vez de add, usamos mod, porque la variable ya existe
+        self.tabla.mod(var_name, new_size)
+        # var_name tiene el mismo var_index
+        self.add_instruction(f"astore_{old_var_index}")
 
-        # i++
-        self.add_instruction(f"iinc {loop_index} 1")
-        self.add_instruction(f"goto {start_label}")
+        # SEGUNDO BUCLE: Copiar desde var_nameRedim a var_name (nuevo)
+        # for i = 0 to new_size-1:
+        #   var_name[i] = var_nameRedim[i]
 
-        self.add_instruction(f"{end_label}:")
+        # i = 0 (reutilizamos el mismo i_loop o creamos uno nuevo)
+        i2_index = self.tabla.add("$i_loop_redim_2", 0)
+        self.add_instruction("iconst_0")
+        self.add_instruction(f"istore_{i2_index}")
 
-        # Ahora el array ya está redimensionado y copiado
-        # Nota: Si sobran posiciones en el nuevo array, se quedan como 0 por defecto.
-        # Si se reduce el tamaño, simplemente no se copian los extra.
+        start_label_2 = f"FOR_START_{self.label_count}"
+        continue_label_2 = f"FOR_CONTINUE_{self.label_count}"
+        end_label_2 = f"FOR_END_{self.label_count}"
+        self.label_count += 1
 
+        self.instructions.append(f"{start_label_2}:")
+        # if i > new_size-1 goto end
+        self.add_instruction(f"iload_{i2_index}")
+        self.add_instruction(f"ldc {new_size - 1}")
+        self.add_instruction(f"if_icmpgt {end_label_2}")
+
+        # var_name[i] = var_nameRedim[i]
+        self.add_instruction(f"aload_{old_var_index}")
+        self.add_instruction(f"iload_{i2_index}")
+        self.add_instruction(f"aload_{temp_var_index}")
+        self.add_instruction(f"iload_{i2_index}")
+        self.add_instruction("iaload")
+        self.add_instruction("iastore")
+
+        self.instructions.append(f"{continue_label_2}:")
+        self.add_instruction(f"iinc {i2_index} 1")
+        self.add_instruction(f"goto {start_label_2}")
+        self.instructions.append(f"{end_label_2}:")
