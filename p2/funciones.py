@@ -28,10 +28,10 @@ VAL = """.method public static extractFirstNumber(Ljava/lang/String;)Ljava/lang/
     invokevirtual java/lang/String/length()I
     istore 6          ; length = input.length()
 
-.loop:
+loop:
     iload 1
     iload 6
-    if_icmpge .done   ; if index >= length, exit loop
+    if_icmpge done   ; if index >= length, exit loop
 
     ; Get the current character
     aload 0
@@ -42,10 +42,10 @@ VAL = """.method public static extractFirstNumber(Ljava/lang/String;)Ljava/lang/
     ; Check if the current character is a digit
     iload 2
     bipush 48         ; '0'
-    if_icmplt .checkSpace
+    if_icmplt checkSpace
     iload 2
     bipush 57         ; '9'
-    if_icmpgt .checkSpace
+    if_icmpgt checkSpace
 
     ; It's a digit, append to numberBuilder
     aload 3
@@ -55,27 +55,27 @@ VAL = """.method public static extractFirstNumber(Ljava/lang/String;)Ljava/lang/
     iconst_1
     istore 5          ; foundDigit = true
 
-.checkSpace:
+checkSpace:
     iload 5
     ifne .continue     ; If we found a digit, continue collecting
     iload 2
     bipush 32         ; ' '
-    if_icmpeq .skip   ; If it's a space, skip it
-    goto .done        ; If it's a non-digit and not a space, exit
+    if_icmpeq skip   ; If it's a space, skip it
+    goto done        ; If it's a non-digit and not a space, exit
 
-.skip:
+skip:
     ; Increment index and continue
     iinc 1 1
-    goto .loop
+    goto loop
 
-.continue:
+continue:
     ; Increment index
     iinc 1 1
-    goto .loop
+    goto loop
 
-.done:
+done:
     iload 5
-    ifeq .returnNull   ; If no digit was found, return null
+    ifeq returnNull   ; If no digit was found, return null
 
     ; Convert StringBuilder to String and parse to int
     aload 3
@@ -88,14 +88,16 @@ VAL = """.method public static extractFirstNumber(Ljava/lang/String;)Ljava/lang/
     areturn
 
 
-.returnNull:
+returnNull:
     aconst_null
     areturn
 
 .end method    """
 LEN = """.method public static len(Ljava/lang/String;)I
     .limit stack 1
-    .limit locals 0
+    .limit locals 1
+
+    aload_0
 
     ; El String ya está en la cima de la pila
     invokevirtual java/lang/String/length()I

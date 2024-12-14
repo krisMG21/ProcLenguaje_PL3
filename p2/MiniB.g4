@@ -141,5 +141,5 @@ NUMBER: ('0x' [0-9a-fA-F]+ ('.' [0-9a-fA-F]+)?)
 
 STRING_LITERAL: '"' (~["\r\n])* '"';
 NEWLINE:    '\r'? '\n';
-COMMENT:    REM ~[\r\n]* -> skip;
+COMMENT:    REM ~[\r\n]* NEWLINE*-> skip;
 WS:         [ \t]+ -> skip;

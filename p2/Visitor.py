@@ -1,4 +1,3 @@
-
 import sys
 from funciones import VAL, LEN, ISNAN
 from antlr4 import ParseTreeVisitor
@@ -109,14 +108,17 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction("dup")
         self.add_instruction("invokespecial java/lang/StringBuilder/<init>()V")
         self.add_instruction(f"ldc {val0}")
-        self.add_instruction("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;")
+        self.add_instruction(
+            "invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+        )
         self.add_instruction(f"ldc {val1}")
-        self.add_instruction("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;")
-        self.add_instruction("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;")
-        self.add_instruction("getstatic java/lang/System/out Ljava/io/PrintStream;")
-        self.add_instruction("swap")
+        self.add_instruction(
+            "invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+        )
+        self.add_instruction(
+            "invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;"
+        )
         return val0 + val1
-
 
     def try_ID(self, exp, var_value, load=True):
         try:
@@ -173,7 +175,7 @@ class Visitor(ParseTreeVisitor):
 
         is_op = False
         try:
-            is_op = bool(ctx.exp.op or ctx.exp.func)
+            is_op = bool(ctx.exp.op or ctx.exp.fun)
         except Exception:
             pass
 
@@ -197,9 +199,12 @@ class Visitor(ParseTreeVisitor):
             # Caso normal
             is_op = False
             try:
-                is_op = bool(ctx.exp.op or ctx.exp.func)
+                is_op = bool(ctx.exp.op)
             except Exception:
-                pass
+                try:
+                    is_op = bool(ctx.exp.fun)
+                except Exception:
+                    pass
 
             self.try_ID(ctx.exp, value, not is_op)
 
@@ -220,7 +225,6 @@ class Visitor(ParseTreeVisitor):
                     printtype = "Ljava/lang/Object;"
 
         self.add_instruction(f"invokevirtual java/io/PrintStream/println({printtype})V")
-
 
     def visitInput(self, ctx: MiniBParser.InputContext):
         """
@@ -568,7 +572,7 @@ class Visitor(ParseTreeVisitor):
         self.add_function(LEN)
 
         self.try_ID(ctx.expr, value)
-        self.add_instruction(".method public static len(Ljava/lang/String;)I")
+        self.add_instruction("invokestatic MiniB/len(Ljava/lang/String;)I")
         return len(value)
 
     def visitIsNanFunction(self, ctx: MiniBParser.IsNanFunctionContext):
@@ -577,7 +581,7 @@ class Visitor(ParseTreeVisitor):
         self.add_function(ISNAN)
 
         self.try_ID(ctx.expr, value)
-        self.add_instruction("invokestatic MiniB/len(Ljava/lang/Object;)I;")
+        self.add_instruction("invokestatic MiniB/len(Ljava/lang/Object;)I")
 
         return 0
 
@@ -607,7 +611,7 @@ class Visitor(ParseTreeVisitor):
             var_index, _ = self.tabla.get(var_name)
             # Si llega aquí, significa que la variable existe
             var_index = self.tabla.mod(var_name, size)
-        except:
+        except Exception:
             # Si lanza error es que no existe, entonces la creamos
             var_index = self.tabla.add(var_name, size)
 
@@ -616,34 +620,37 @@ class Visitor(ParseTreeVisitor):
 
     def visitArrayOp(self, ctx: MiniBParser.ArrayOpContext):
         var_name = ctx.ID().getText()
-        var_index, array_size = self.tabla.get(var_name)  # Ahora array_size es el tamaño del array
+        var_index, array_size = self.tabla.get(
+            var_name
+        )  # Ahora array_size es el tamaño del array
 
         # Cargar la referencia del array
         self.add_instruction(f"aload_{var_index}")
 
         # Cargar el índice
         index_value = self.visit(ctx.exp1)
-        if not isinstance(ctx.exp1, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.exp1, MiniBParser.ArrayAccessExpressionContext):
+        if not isinstance(
+            ctx.exp1, MiniBParser.ArithmeticExpressionContext
+        ) and not isinstance(ctx.exp1, MiniBParser.ArrayAccessExpressionContext):
             self.try_ID(ctx.exp1, index_value)
 
         # Cargar el valor a asignar
         if ctx.exp2:
             value = self.visit(ctx.exp2)
-            if not isinstance(ctx.exp2, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.exp2, MiniBParser.ArrayAccessExpressionContext):
+            if not isinstance(
+                ctx.exp2, MiniBParser.ArithmeticExpressionContext
+            ) and not isinstance(ctx.exp2, MiniBParser.ArrayAccessExpressionContext):
                 self.try_ID(ctx.exp2, value)
         else:
             value = self.visit(ctx.cond)
-            if not isinstance(ctx.cond, MiniBParser.ArithmeticExpressionContext) and not isinstance(ctx.cond, MiniBParser.ArrayAccessExpressionContext):
+            if not isinstance(
+                ctx.cond, MiniBParser.ArithmeticExpressionContext
+            ) and not isinstance(ctx.cond, MiniBParser.ArrayAccessExpressionContext):
                 self.try_ID(ctx.cond, value)
 
         # Ahora: stack = [arrayref, index, value]
         self.add_instruction("iastore")
 
-
-
-
-
-        
     def visitArrayAccessExpression(self, ctx: MiniBParser.ArrayAccessExpressionContext):
         var_name = ctx.ID().getText()
         var_index, array_size = self.tabla.get(var_name)  # obtener también el tamaño
@@ -658,7 +665,6 @@ class Visitor(ParseTreeVisitor):
         # stack = [arrayref, index]
         self.add_instruction("iaload")  # Carga el valor del array en la pila
         return None
-
 
     def visitRedim(self, ctx: MiniBParser.RedimContext):
         # Obtener el nombre del array y su tamaño actual
