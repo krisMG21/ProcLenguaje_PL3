@@ -15,6 +15,7 @@ statement:  letStmt
             | keyStmt
             | dimStmt
             | redimStmt
+            | functionDefStmt
             ;
 
 letStmt:    LET ID '=' exp=expression #Let
@@ -89,9 +90,16 @@ expression: left=expression op=arithmeticOp right=expression #ArithmeticExpressi
             | ID '[' expr=expression ']' #ArrayAccessExpression
             ;
 
+functionDefStmt: DEF ftype=TYPE name=ID '(' (ptypes=TYPE params=ID (','ptypes=TYPE params=ID)*)? ')'
+            '{'
+                 (stat=statement NEWLINE)* stat=statement?
+            '}' #FunctionDef
+            ;
+
 functionCall: VAL '(' expr=expression ')'   #ValFunction
             | LEN '(' expr=expression ')'   #LenFunction
             | ISNAN '(' expr=expression ')' #IsNanFunction
+            | name=ID '(' (expr=expression (',' expr=expression)*)? ')' #GenericFunction
             ;
 
 // LEXER RULES
@@ -120,6 +128,8 @@ ISNAN:      'ISNAN' | 'isnan' ;
 REM:        'REM' | 'rem' ;
 DIM:        'DIM' | 'dim' ;
 REDIM:      'REDIM' | 'redim' ;
+DEF:        'DEF' | 'def' ;
+TYPE:       'INT' | 'int' | 'FLOAT' | 'float' | 'STRING' | 'string' | 'LIST' | 'list' | 'BOOLEAN' | 'boolean' ;
 
 LT:         '<' ;
 GT:         '>' ;

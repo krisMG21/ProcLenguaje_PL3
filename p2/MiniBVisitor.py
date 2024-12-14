@@ -174,6 +174,11 @@ class MiniBVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniBParser#FunctionDef.
+    def visitFunctionDef(self, ctx:MiniBParser.FunctionDefContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniBParser#ValFunction.
     def visitValFunction(self, ctx:MiniBParser.ValFunctionContext):
         return self.visitChildren(ctx)
@@ -186,6 +191,11 @@ class MiniBVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by MiniBParser#IsNanFunction.
     def visitIsNanFunction(self, ctx:MiniBParser.IsNanFunctionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniBParser#GenericFunction.
+    def visitGenericFunction(self, ctx:MiniBParser.GenericFunctionContext):
         return self.visitChildren(ctx)
 
 

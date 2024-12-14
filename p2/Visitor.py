@@ -102,6 +102,18 @@ class Visitor(ParseTreeVisitor):
             case float():
                 self.add_instruction(f"fload_{var_index}")
 
+    def load_var_f(self, var_index: int, var_value):
+        """
+        Carga una variable en la pila con el tipo adecuado.
+        """
+        match var_value:
+            case str() | None:
+                self.add_function(f"aload_{var_index}")
+            case int() | bool():
+                self.add_function(f"iload_{var_index}")
+            case float():
+                self.add_function(f"fload_{var_index}")
+
     def concat(self, val0: str, val1: str):
         # En vez de triple comillas, añadir cada instrucción por separado
         self.add_instruction("new java/lang/StringBuilder")
@@ -120,19 +132,45 @@ class Visitor(ParseTreeVisitor):
         )
         return val0 + val1
 
-    def try_ID(self, exp, var_value, load=True):
+    def have_to_load(self, exp):
+        is_op = False
+        try:
+            is_op = bool(exp.op)
+        except Exception:
+            try:
+                is_op = bool(exp.fun)
+            except Exception:
+                pass
+
+        return not is_op
+
+    def try_ID(self, exp, var_value):
         try:
             var_name = exp.ID().getText()
             var_index, _ = self.tabla.get(var_name)
             self.load_var(var_index, var_value)
         except AttributeError:
-            if load:
+            if self.have_to_load(exp):
                 if (
                     isinstance(var_value, str)
                     and '"' not in var_value[1:-1]
                     or not isinstance(var_value, str)
                 ):
                     self.add_instruction(f"ldc {var_value}")
+
+    def try_IDf(self, exp, var_value):
+        try:
+            var_name = exp.ID().getText()
+            var_index, _ = self.tabla.get(var_name)
+            self.load_var_f(var_index, var_value)
+        except AttributeError:
+            if self.have_to_load(exp):
+                if (
+                    isinstance(var_value, str)
+                    and '"' not in var_value[1:-1]
+                    or not isinstance(var_value, str)
+                ):
+                    self.add_function(f"ldc {var_value}")
 
     def visitProgram(self, ctx: MiniBParser.ProgramContext):
         """
@@ -170,16 +208,9 @@ class Visitor(ParseTreeVisitor):
         # print("En op: ", ctx.ID().getText())
         var_name = ctx.ID().getText()
         var_value = self.visit(ctx.exp)
-
         var_index = self.tabla.mod(var_name, var_value)
 
-        is_op = False
-        try:
-            is_op = bool(ctx.exp.op or ctx.exp.fun)
-        except Exception:
-            pass
-
-        self.try_ID(ctx.exp, var_value, not is_op)
+        self.try_ID(ctx.exp, var_value)
         self.store_var(var_index, var_value)
 
     def visitPrint(self, ctx: MiniBParser.PrintContext):
@@ -197,16 +228,7 @@ class Visitor(ParseTreeVisitor):
             printtype = "I"
         else:
             # Caso normal
-            is_op = False
-            try:
-                is_op = bool(ctx.exp.op)
-            except Exception:
-                try:
-                    is_op = bool(ctx.exp.fun)
-                except Exception:
-                    pass
-
-            self.try_ID(ctx.exp, value, not is_op)
+            self.try_ID(ctx.exp, value)
 
             # Asignar printtype según el valor
             match value:
@@ -413,12 +435,6 @@ class Visitor(ParseTreeVisitor):
     def visitCondExp(self, ctx: MiniBParser.CondExpContext):
         val = self.visit(ctx.expr)
 
-        is_op = False
-        try:
-            is_op = bool(ctx.expr.op)
-        except Exception:
-            pass
-
     def visitArithmeticExpression(self, ctx: MiniBParser.ArithmeticExpressionContext):
         val0 = self.visit(ctx.expression(0))
         val1 = self.visit(ctx.expression(1))
@@ -538,10 +554,41 @@ class Visitor(ParseTreeVisitor):
         # self.load_var(var_index, var_value)
         return var_value
 
-    def visitFunctionCallExpression(
-        self, ctx: MiniBParser.FunctionCallExpressionContext
-    ):
-        fname = ctx.fun.getText()
+    def visitGenericFunction(self, ctx: MiniBParser.GenericFunctionContext):
+        fname = ctx.name.getText()
+        ftype = ctx.ftype.getText()
+        pt = ""
+        ptypes = ctx.ptypes
+        params = ctx.params
+
+        if ftype == "INT":
+            ftype = "I"
+        elif ftype == "FLOAT":
+            ftype = "F"
+        elif ftype == "STRING":
+            ftype = "Ljava/lang/String;"
+        elif ftype == "LIST":
+            ftype = "Ljava/util/List;"
+        elif ftype == "BOOLEAN":
+            ftype = "Z"
+        else:
+            ftype = "Ljava/lang/Object;"
+
+        if params:
+            for i in range(len(params)):
+                value = self.visit(params[i])
+                self.try_IDf(params[i], value)
+
+        if ptypes:
+            params = ", ".join(
+                [f"{ptypes.getText()} {params.getText()}" for params in ctx.params]
+            )
+            params = f"({params})"
+        else:
+            params = ""
+
+        print(f"invokestatic MiniB/{fname}({ftype}){ftype}{params}")
+
         # Leer nombre de función y llamarla con MiniB/nombre
         # Leer los parámetros para cargarlos en la pila
         return self.visit(ctx.fun)
