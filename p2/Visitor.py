@@ -20,6 +20,7 @@ class Visitor(ParseTreeVisitor):
         self.local_limit = 100
 
         self.tabla = SymbolTable()
+        self.function_defs = {}
         self.error = False
 
     def get_jasmin_code(self):
@@ -38,9 +39,9 @@ class Visitor(ParseTreeVisitor):
 """
         return (
             header
+            + "\n".join(self.imports)
             + "\n".join(self.functions)
             + main
-            + "\n".join(self.imports)
             + "\n".join(self.instructions)
             + footer
         )
@@ -450,23 +451,31 @@ class Visitor(ParseTreeVisitor):
         if isinstance(val0, str) and not isinstance(val1, str):
             try:
                 raw_val0 = val0.strip('"')  # Elimina las comillas externas
-                val0 = int(raw_val0) if '.' not in raw_val0 else float(raw_val0)
+                val0 = int(raw_val0) if "." not in raw_val0 else float(raw_val0)
                 var_name_0 = ctx.expression(0).getText()
-                var_index_0 = self.tabla.add(f"{var_name_0}_num", val0)  # Asignar nueva posición
+                var_index_0 = self.tabla.add(
+                    f"{var_name_0}_num", val0
+                )  # Asignar nueva posición
                 self.add_instruction(f"ldc {val0}")  # Cargar el valor convertido
                 self.store_var(var_index_0, val0)  # Guardar el valor convertido
             except ValueError:
-                raise TypeError(f"Operación no válida: no se puede convertir '{val0}' a número.")
+                raise TypeError(
+                    f"Operación no válida: no se puede convertir '{val0}' a número."
+                )
         elif isinstance(val1, str) and not isinstance(val0, str):
             try:
                 raw_val1 = val1.strip('"')  # Elimina las comillas externas
-                val1 = int(raw_val1) if '.' not in raw_val1 else float(raw_val1)
+                val1 = int(raw_val1) if "." not in raw_val1 else float(raw_val1)
                 var_name_1 = ctx.expression(1).getText()
-                var_index_1 = self.tabla.add(f"{var_name_1}_num", val1)  # Asignar nueva posición
+                var_index_1 = self.tabla.add(
+                    f"{var_name_1}_num", val1
+                )  # Asignar nueva posición
                 self.add_instruction(f"ldc {val1}")  # Cargar el valor convertido
                 self.store_var(var_index_1, val1)  # Guardar el valor convertido
             except ValueError:
-                raise TypeError(f"Operación no válida: no se puede convertir '{val1}' a número.")
+                raise TypeError(
+                    f"Operación no válida: no se puede convertir '{val1}' a número."
+                )
         elif isinstance(val0, str) and isinstance(val1, str):
             return self.concat(val0, val1)
 
@@ -517,9 +526,6 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(instr)
 
         return val0
-
-
-
 
     def visitPlusOperation(self, ctx: MiniBParser.PlusOperationContext):
         return "+"
@@ -587,44 +593,49 @@ class Visitor(ParseTreeVisitor):
         # self.load_var(var_index, var_value)
         return var_value
 
+    def visitFunctionDef(self, ctx: MiniBParser.FunctionDefContext):
+        # Extract function name and parameters
+        function_name = ctx.name.text
+        params = ctx.params.text.split(",") if ctx.params else []
+        param_count = len(params)
+
+        # Visit the expression (function body)
+        function_body = self.visit(ctx.exp)
+
+        jasmin_code = f"""
+.method public static {function_name}({'I' * param_count})I
+    .limit stack 10
+    .limit locals {param_count + 1}
+
+    ; Load parameters into local variables
+"""
+        for i, param in enumerate(params):
+            jasmin_code += f"    iload_{i} ; Load parameter {param}\n"
+
+        jasmin_code += f"""
+    ; Function body
+        {function_body}
+
+    ireturn
+.end method
+    """
+        # Add the function to the list of defined functions
+        self.add_function(jasmin_code)
+
     def visitGenericFunction(self, ctx: MiniBParser.GenericFunctionContext):
-        fname = ctx.name.getText()
-        ftype = ctx.ftype.getText()
-        pt = ""
-        ptypes = ctx.ptypes
-        params = ctx.params
+        # Extract function name and arguments
+        function_name = ctx.name.text
+        arguments = ctx.expr
 
-        if ftype == "INT":
-            ftype = "I"
-        elif ftype == "FLOAT":
-            ftype = "F"
-        elif ftype == "STRING":
-            ftype = "Ljava/lang/String;"
-        elif ftype == "LIST":
-            ftype = "Ljava/util/List;"
-        elif ftype == "BOOLEAN":
-            ftype = "Z"
-        else:
-            ftype = "Ljava/lang/Object;"
+        # Visit each argument and push it onto the stack
+        for arg in arguments:
+            self.visit(arg)
 
-        if params:
-            for i in range(len(params)):
-                value = self.visit(params[i])
-                self.try_IDf(params[i], value)
-
-        if ptypes:
-            params = ", ".join(
-                [f"{ptypes.getText()} {params.getText()}" for params in ctx.params]
-            )
-            params = f"({params})"
-        else:
-            params = ""
-
-        print(f"invokestatic MiniB/{fname}({ftype}){ftype}{params}")
-
-        # Leer nombre de función y llamarla con MiniB/nombre
-        # Leer los parámetros para cargarlos en la pila
-        return self.visit(ctx.fun)
+        # Generate Jasmin code to call the function
+        param_count = len(arguments)
+        self.add_instruction(
+            f"invokestatic MiniB/{function_name}({'I' * param_count})I"
+        )
 
     def visitValFunction(self, ctx: MiniBParser.ValFunctionContext):
         value = self.visit(ctx.expr)
@@ -826,6 +837,3 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"iinc {i2_index} 1")
         self.add_instruction(f"goto {start_label_2}")
         self.add_instruction(f"{end_label_2}:")
-
-
-

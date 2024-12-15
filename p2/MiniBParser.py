@@ -10,7 +10,7 @@ else:
 
 def serializedATN():
     return [
-        4,1,49,296,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,47,280,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
         2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,
         7,20,1,0,1,0,4,0,45,8,0,11,0,12,0,46,5,0,49,8,0,10,0,12,0,52,9,0,
@@ -28,93 +28,86 @@ def serializedATN():
         1,17,1,17,1,17,1,17,1,17,1,17,3,17,208,8,17,1,18,1,18,1,18,1,18,
         1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,1,18,3,18,224,8,18,
         1,18,1,18,1,18,1,18,5,18,230,8,18,10,18,12,18,233,9,18,1,19,1,19,
-        1,19,1,19,1,19,1,19,1,19,1,19,1,19,5,19,244,8,19,10,19,12,19,247,
-        9,19,3,19,249,8,19,1,19,1,19,1,19,1,19,1,19,5,19,256,8,19,10,19,
-        12,19,259,9,19,1,19,3,19,262,8,19,1,19,1,19,1,20,1,20,1,20,1,20,
-        1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,
-        1,20,1,20,1,20,5,20,286,8,20,10,20,12,20,289,9,20,3,20,291,8,20,
-        1,20,3,20,294,8,20,1,20,0,1,36,21,0,2,4,6,8,10,12,14,16,18,20,22,
-        24,26,28,30,32,34,36,38,40,0,2,1,0,9,10,1,0,35,39,320,0,50,1,0,0,
-        0,2,71,1,0,0,0,4,73,1,0,0,0,6,78,1,0,0,0,8,84,1,0,0,0,10,93,1,0,
-        0,0,12,96,1,0,0,0,14,100,1,0,0,0,16,126,1,0,0,0,18,143,1,0,0,0,20,
-        156,1,0,0,0,22,171,1,0,0,0,24,173,1,0,0,0,26,179,1,0,0,0,28,185,
-        1,0,0,0,30,187,1,0,0,0,32,194,1,0,0,0,34,207,1,0,0,0,36,223,1,0,
-        0,0,38,234,1,0,0,0,40,293,1,0,0,0,42,44,3,2,1,0,43,45,5,47,0,0,44,
-        43,1,0,0,0,45,46,1,0,0,0,46,44,1,0,0,0,46,47,1,0,0,0,47,49,1,0,0,
-        0,48,42,1,0,0,0,49,52,1,0,0,0,50,48,1,0,0,0,50,51,1,0,0,0,51,54,
-        1,0,0,0,52,50,1,0,0,0,53,55,3,2,1,0,54,53,1,0,0,0,54,55,1,0,0,0,
-        55,56,1,0,0,0,56,57,5,0,0,1,57,1,1,0,0,0,58,72,3,4,2,0,59,72,3,6,
-        3,0,60,72,3,8,4,0,61,72,3,10,5,0,62,72,3,12,6,0,63,72,3,14,7,0,64,
-        72,3,16,8,0,65,72,3,18,9,0,66,72,3,20,10,0,67,72,3,22,11,0,68,72,
-        3,24,12,0,69,72,3,26,13,0,70,72,3,38,19,0,71,58,1,0,0,0,71,59,1,
-        0,0,0,71,60,1,0,0,0,71,61,1,0,0,0,71,62,1,0,0,0,71,63,1,0,0,0,71,
-        64,1,0,0,0,71,65,1,0,0,0,71,66,1,0,0,0,71,67,1,0,0,0,71,68,1,0,0,
-        0,71,69,1,0,0,0,71,70,1,0,0,0,72,3,1,0,0,0,73,74,5,11,0,0,74,75,
-        5,44,0,0,75,76,5,39,0,0,76,77,3,36,18,0,77,5,1,0,0,0,78,79,5,44,
-        0,0,79,82,5,39,0,0,80,83,3,36,18,0,81,83,3,34,17,0,82,80,1,0,0,0,
-        82,81,1,0,0,0,83,7,1,0,0,0,84,85,5,44,0,0,85,86,5,1,0,0,86,87,3,
-        36,18,0,87,88,5,2,0,0,88,91,5,39,0,0,89,92,3,36,18,0,90,92,3,34,
-        17,0,91,89,1,0,0,0,91,90,1,0,0,0,92,9,1,0,0,0,93,94,5,12,0,0,94,
-        95,3,36,18,0,95,11,1,0,0,0,96,97,5,13,0,0,97,98,5,46,0,0,98,99,5,
-        44,0,0,99,13,1,0,0,0,100,101,5,14,0,0,101,102,3,34,17,0,102,103,
-        5,25,0,0,103,109,5,47,0,0,104,105,3,2,1,0,105,106,5,47,0,0,106,108,
-        1,0,0,0,107,104,1,0,0,0,108,111,1,0,0,0,109,107,1,0,0,0,109,110,
-        1,0,0,0,110,122,1,0,0,0,111,109,1,0,0,0,112,113,5,15,0,0,113,119,
-        5,47,0,0,114,115,3,2,1,0,115,116,5,47,0,0,116,118,1,0,0,0,117,114,
-        1,0,0,0,118,121,1,0,0,0,119,117,1,0,0,0,119,120,1,0,0,0,120,123,
-        1,0,0,0,121,119,1,0,0,0,122,112,1,0,0,0,122,123,1,0,0,0,123,124,
-        1,0,0,0,124,125,5,24,0,0,125,15,1,0,0,0,126,127,5,16,0,0,127,128,
-        5,44,0,0,128,129,5,39,0,0,129,130,3,36,18,0,130,131,5,17,0,0,131,
-        132,3,36,18,0,132,138,5,47,0,0,133,134,3,2,1,0,134,135,5,47,0,0,
-        135,137,1,0,0,0,136,133,1,0,0,0,137,140,1,0,0,0,138,136,1,0,0,0,
-        138,139,1,0,0,0,139,141,1,0,0,0,140,138,1,0,0,0,141,142,5,18,0,0,
-        142,17,1,0,0,0,143,144,5,19,0,0,144,145,3,34,17,0,145,151,5,47,0,
-        0,146,147,3,2,1,0,147,148,5,47,0,0,148,150,1,0,0,0,149,146,1,0,0,
-        0,150,153,1,0,0,0,151,149,1,0,0,0,151,152,1,0,0,0,152,154,1,0,0,
-        0,153,151,1,0,0,0,154,155,5,24,0,0,155,19,1,0,0,0,156,157,5,20,0,
-        0,157,163,5,47,0,0,158,159,3,2,1,0,159,160,5,47,0,0,160,162,1,0,
-        0,0,161,158,1,0,0,0,162,165,1,0,0,0,163,161,1,0,0,0,163,164,1,0,
-        0,0,164,166,1,0,0,0,165,163,1,0,0,0,166,167,5,21,0,0,167,168,3,34,
-        17,0,168,21,1,0,0,0,169,172,5,22,0,0,170,172,5,23,0,0,171,169,1,
-        0,0,0,171,170,1,0,0,0,172,23,1,0,0,0,173,174,5,31,0,0,174,175,5,
-        44,0,0,175,176,5,1,0,0,176,177,3,36,18,0,177,178,5,2,0,0,178,25,
-        1,0,0,0,179,180,5,32,0,0,180,181,5,44,0,0,181,182,5,1,0,0,182,183,
-        3,36,18,0,183,184,5,2,0,0,184,27,1,0,0,0,185,186,7,0,0,0,186,29,
-        1,0,0,0,187,188,7,1,0,0,188,31,1,0,0,0,189,195,5,40,0,0,190,195,
-        5,41,0,0,191,195,5,42,0,0,192,195,5,43,0,0,193,195,5,26,0,0,194,
-        189,1,0,0,0,194,190,1,0,0,0,194,191,1,0,0,0,194,192,1,0,0,0,194,
-        193,1,0,0,0,195,33,1,0,0,0,196,197,3,36,18,0,197,198,3,30,15,0,198,
-        199,3,36,18,0,199,208,1,0,0,0,200,201,5,8,0,0,201,208,3,34,17,0,
-        202,203,3,36,18,0,203,204,3,28,14,0,204,205,3,34,17,0,205,208,1,
-        0,0,0,206,208,3,36,18,0,207,196,1,0,0,0,207,200,1,0,0,0,207,202,
-        1,0,0,0,207,206,1,0,0,0,208,35,1,0,0,0,209,210,6,18,-1,0,210,211,
-        5,3,0,0,211,212,3,36,18,0,212,213,5,4,0,0,213,224,1,0,0,0,214,224,
-        3,40,20,0,215,224,5,45,0,0,216,224,5,46,0,0,217,224,5,44,0,0,218,
-        219,5,44,0,0,219,220,5,1,0,0,220,221,3,36,18,0,221,222,5,2,0,0,222,
-        224,1,0,0,0,223,209,1,0,0,0,223,214,1,0,0,0,223,215,1,0,0,0,223,
-        216,1,0,0,0,223,217,1,0,0,0,223,218,1,0,0,0,224,231,1,0,0,0,225,
-        226,10,7,0,0,226,227,3,32,16,0,227,228,3,36,18,8,228,230,1,0,0,0,
-        229,225,1,0,0,0,230,233,1,0,0,0,231,229,1,0,0,0,231,232,1,0,0,0,
-        232,37,1,0,0,0,233,231,1,0,0,0,234,235,5,33,0,0,235,236,5,34,0,0,
-        236,237,5,44,0,0,237,248,5,3,0,0,238,239,5,34,0,0,239,245,5,44,0,
-        0,240,241,5,5,0,0,241,242,5,34,0,0,242,244,5,44,0,0,243,240,1,0,
-        0,0,244,247,1,0,0,0,245,243,1,0,0,0,245,246,1,0,0,0,246,249,1,0,
-        0,0,247,245,1,0,0,0,248,238,1,0,0,0,248,249,1,0,0,0,249,250,1,0,
-        0,0,250,251,5,4,0,0,251,257,5,6,0,0,252,253,3,2,1,0,253,254,5,47,
-        0,0,254,256,1,0,0,0,255,252,1,0,0,0,256,259,1,0,0,0,257,255,1,0,
-        0,0,257,258,1,0,0,0,258,261,1,0,0,0,259,257,1,0,0,0,260,262,3,2,
-        1,0,261,260,1,0,0,0,261,262,1,0,0,0,262,263,1,0,0,0,263,264,5,7,
-        0,0,264,39,1,0,0,0,265,266,5,27,0,0,266,267,5,3,0,0,267,268,3,36,
-        18,0,268,269,5,4,0,0,269,294,1,0,0,0,270,271,5,28,0,0,271,272,5,
-        3,0,0,272,273,3,36,18,0,273,274,5,4,0,0,274,294,1,0,0,0,275,276,
-        5,29,0,0,276,277,5,3,0,0,277,278,3,36,18,0,278,279,5,4,0,0,279,294,
-        1,0,0,0,280,281,5,44,0,0,281,290,5,3,0,0,282,287,3,36,18,0,283,284,
-        5,5,0,0,284,286,3,36,18,0,285,283,1,0,0,0,286,289,1,0,0,0,287,285,
-        1,0,0,0,287,288,1,0,0,0,288,291,1,0,0,0,289,287,1,0,0,0,290,282,
-        1,0,0,0,290,291,1,0,0,0,291,292,1,0,0,0,292,294,5,4,0,0,293,265,
-        1,0,0,0,293,270,1,0,0,0,293,275,1,0,0,0,293,280,1,0,0,0,294,41,1,
-        0,0,0,24,46,50,54,71,82,91,109,119,122,138,151,163,171,194,207,223,
-        231,245,248,257,261,287,290,293
+        1,19,1,19,1,19,1,19,5,19,241,8,19,10,19,12,19,244,9,19,1,19,1,19,
+        1,19,1,19,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,
+        1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,5,20,270,8,20,10,20,
+        12,20,273,9,20,3,20,275,8,20,1,20,3,20,278,8,20,1,20,0,1,36,21,0,
+        2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,0,2,1,0,
+        7,8,1,0,33,37,301,0,50,1,0,0,0,2,71,1,0,0,0,4,73,1,0,0,0,6,78,1,
+        0,0,0,8,84,1,0,0,0,10,93,1,0,0,0,12,96,1,0,0,0,14,100,1,0,0,0,16,
+        126,1,0,0,0,18,143,1,0,0,0,20,156,1,0,0,0,22,171,1,0,0,0,24,173,
+        1,0,0,0,26,179,1,0,0,0,28,185,1,0,0,0,30,187,1,0,0,0,32,194,1,0,
+        0,0,34,207,1,0,0,0,36,223,1,0,0,0,38,234,1,0,0,0,40,277,1,0,0,0,
+        42,44,3,2,1,0,43,45,5,45,0,0,44,43,1,0,0,0,45,46,1,0,0,0,46,44,1,
+        0,0,0,46,47,1,0,0,0,47,49,1,0,0,0,48,42,1,0,0,0,49,52,1,0,0,0,50,
+        48,1,0,0,0,50,51,1,0,0,0,51,54,1,0,0,0,52,50,1,0,0,0,53,55,3,2,1,
+        0,54,53,1,0,0,0,54,55,1,0,0,0,55,56,1,0,0,0,56,57,5,0,0,1,57,1,1,
+        0,0,0,58,72,3,4,2,0,59,72,3,6,3,0,60,72,3,8,4,0,61,72,3,10,5,0,62,
+        72,3,12,6,0,63,72,3,14,7,0,64,72,3,16,8,0,65,72,3,18,9,0,66,72,3,
+        20,10,0,67,72,3,22,11,0,68,72,3,24,12,0,69,72,3,26,13,0,70,72,3,
+        38,19,0,71,58,1,0,0,0,71,59,1,0,0,0,71,60,1,0,0,0,71,61,1,0,0,0,
+        71,62,1,0,0,0,71,63,1,0,0,0,71,64,1,0,0,0,71,65,1,0,0,0,71,66,1,
+        0,0,0,71,67,1,0,0,0,71,68,1,0,0,0,71,69,1,0,0,0,71,70,1,0,0,0,72,
+        3,1,0,0,0,73,74,5,9,0,0,74,75,5,42,0,0,75,76,5,37,0,0,76,77,3,36,
+        18,0,77,5,1,0,0,0,78,79,5,42,0,0,79,82,5,37,0,0,80,83,3,36,18,0,
+        81,83,3,34,17,0,82,80,1,0,0,0,82,81,1,0,0,0,83,7,1,0,0,0,84,85,5,
+        42,0,0,85,86,5,1,0,0,86,87,3,36,18,0,87,88,5,2,0,0,88,91,5,37,0,
+        0,89,92,3,36,18,0,90,92,3,34,17,0,91,89,1,0,0,0,91,90,1,0,0,0,92,
+        9,1,0,0,0,93,94,5,10,0,0,94,95,3,36,18,0,95,11,1,0,0,0,96,97,5,11,
+        0,0,97,98,5,44,0,0,98,99,5,42,0,0,99,13,1,0,0,0,100,101,5,12,0,0,
+        101,102,3,34,17,0,102,103,5,23,0,0,103,109,5,45,0,0,104,105,3,2,
+        1,0,105,106,5,45,0,0,106,108,1,0,0,0,107,104,1,0,0,0,108,111,1,0,
+        0,0,109,107,1,0,0,0,109,110,1,0,0,0,110,122,1,0,0,0,111,109,1,0,
+        0,0,112,113,5,13,0,0,113,119,5,45,0,0,114,115,3,2,1,0,115,116,5,
+        45,0,0,116,118,1,0,0,0,117,114,1,0,0,0,118,121,1,0,0,0,119,117,1,
+        0,0,0,119,120,1,0,0,0,120,123,1,0,0,0,121,119,1,0,0,0,122,112,1,
+        0,0,0,122,123,1,0,0,0,123,124,1,0,0,0,124,125,5,22,0,0,125,15,1,
+        0,0,0,126,127,5,14,0,0,127,128,5,42,0,0,128,129,5,37,0,0,129,130,
+        3,36,18,0,130,131,5,15,0,0,131,132,3,36,18,0,132,138,5,45,0,0,133,
+        134,3,2,1,0,134,135,5,45,0,0,135,137,1,0,0,0,136,133,1,0,0,0,137,
+        140,1,0,0,0,138,136,1,0,0,0,138,139,1,0,0,0,139,141,1,0,0,0,140,
+        138,1,0,0,0,141,142,5,16,0,0,142,17,1,0,0,0,143,144,5,17,0,0,144,
+        145,3,34,17,0,145,151,5,45,0,0,146,147,3,2,1,0,147,148,5,45,0,0,
+        148,150,1,0,0,0,149,146,1,0,0,0,150,153,1,0,0,0,151,149,1,0,0,0,
+        151,152,1,0,0,0,152,154,1,0,0,0,153,151,1,0,0,0,154,155,5,22,0,0,
+        155,19,1,0,0,0,156,157,5,18,0,0,157,163,5,45,0,0,158,159,3,2,1,0,
+        159,160,5,45,0,0,160,162,1,0,0,0,161,158,1,0,0,0,162,165,1,0,0,0,
+        163,161,1,0,0,0,163,164,1,0,0,0,164,166,1,0,0,0,165,163,1,0,0,0,
+        166,167,5,19,0,0,167,168,3,34,17,0,168,21,1,0,0,0,169,172,5,20,0,
+        0,170,172,5,21,0,0,171,169,1,0,0,0,171,170,1,0,0,0,172,23,1,0,0,
+        0,173,174,5,29,0,0,174,175,5,42,0,0,175,176,5,1,0,0,176,177,3,36,
+        18,0,177,178,5,2,0,0,178,25,1,0,0,0,179,180,5,30,0,0,180,181,5,42,
+        0,0,181,182,5,1,0,0,182,183,3,36,18,0,183,184,5,2,0,0,184,27,1,0,
+        0,0,185,186,7,0,0,0,186,29,1,0,0,0,187,188,7,1,0,0,188,31,1,0,0,
+        0,189,195,5,38,0,0,190,195,5,39,0,0,191,195,5,40,0,0,192,195,5,41,
+        0,0,193,195,5,24,0,0,194,189,1,0,0,0,194,190,1,0,0,0,194,191,1,0,
+        0,0,194,192,1,0,0,0,194,193,1,0,0,0,195,33,1,0,0,0,196,197,3,36,
+        18,0,197,198,3,30,15,0,198,199,3,36,18,0,199,208,1,0,0,0,200,201,
+        5,6,0,0,201,208,3,34,17,0,202,203,3,36,18,0,203,204,3,28,14,0,204,
+        205,3,34,17,0,205,208,1,0,0,0,206,208,3,36,18,0,207,196,1,0,0,0,
+        207,200,1,0,0,0,207,202,1,0,0,0,207,206,1,0,0,0,208,35,1,0,0,0,209,
+        210,6,18,-1,0,210,211,5,3,0,0,211,212,3,36,18,0,212,213,5,4,0,0,
+        213,224,1,0,0,0,214,224,3,40,20,0,215,224,5,43,0,0,216,224,5,44,
+        0,0,217,224,5,42,0,0,218,219,5,42,0,0,219,220,5,1,0,0,220,221,3,
+        36,18,0,221,222,5,2,0,0,222,224,1,0,0,0,223,209,1,0,0,0,223,214,
+        1,0,0,0,223,215,1,0,0,0,223,216,1,0,0,0,223,217,1,0,0,0,223,218,
+        1,0,0,0,224,231,1,0,0,0,225,226,10,7,0,0,226,227,3,32,16,0,227,228,
+        3,36,18,8,228,230,1,0,0,0,229,225,1,0,0,0,230,233,1,0,0,0,231,229,
+        1,0,0,0,231,232,1,0,0,0,232,37,1,0,0,0,233,231,1,0,0,0,234,235,5,
+        31,0,0,235,236,5,42,0,0,236,237,5,3,0,0,237,242,5,42,0,0,238,239,
+        5,5,0,0,239,241,5,42,0,0,240,238,1,0,0,0,241,244,1,0,0,0,242,240,
+        1,0,0,0,242,243,1,0,0,0,243,245,1,0,0,0,244,242,1,0,0,0,245,246,
+        5,4,0,0,246,247,5,37,0,0,247,248,3,36,18,0,248,39,1,0,0,0,249,250,
+        5,25,0,0,250,251,5,3,0,0,251,252,3,36,18,0,252,253,5,4,0,0,253,278,
+        1,0,0,0,254,255,5,26,0,0,255,256,5,3,0,0,256,257,3,36,18,0,257,258,
+        5,4,0,0,258,278,1,0,0,0,259,260,5,27,0,0,260,261,5,3,0,0,261,262,
+        3,36,18,0,262,263,5,4,0,0,263,278,1,0,0,0,264,265,5,42,0,0,265,274,
+        5,3,0,0,266,271,3,36,18,0,267,268,5,5,0,0,268,270,3,36,18,0,269,
+        267,1,0,0,0,270,273,1,0,0,0,271,269,1,0,0,0,271,272,1,0,0,0,272,
+        275,1,0,0,0,273,271,1,0,0,0,274,266,1,0,0,0,274,275,1,0,0,0,275,
+        276,1,0,0,0,276,278,5,4,0,0,277,249,1,0,0,0,277,254,1,0,0,0,277,
+        259,1,0,0,0,277,264,1,0,0,0,278,41,1,0,0,0,21,46,50,54,71,82,91,
+        109,119,122,138,151,163,171,194,207,223,231,242,271,274,277
     ]
 
 class MiniBParser ( Parser ):
@@ -127,25 +120,24 @@ class MiniBParser ( Parser ):
 
     sharedContextCache = PredictionContextCache()
 
-    literalNames = [ "<INVALID>", "'['", "']'", "'('", "')'", "','", "'{'", 
-                     "'}'", "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
+    literalNames = [ "<INVALID>", "'['", "']'", "'('", "')'", "','", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                     "<INVALID>", "<INVALID>", "<INVALID>", "'<'", "'>'", 
-                     "'<='", "'>='", "'='", "'+'", "'-'", "'*'", "'/'" ]
+                     "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
+                     "<INVALID>", "<INVALID>", "'<'", "'>'", "'<='", "'>='", 
+                     "'='", "'+'", "'-'", "'*'", "'/'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "NOT", "AND", "OR", "LET", "PRINT", "INPUT", "IF", 
-                      "ELSE", "FOR", "TO", "NEXT", "WHILE", "REPEAT", "UNTIL", 
-                      "CONTINUE", "EXIT", "END", "THEN", "MOD", "VAL", "LEN", 
-                      "ISNAN", "REM", "DIM", "REDIM", "DEF", "TYPE", "LT", 
-                      "GT", "LE", "GE", "EQ", "PLUS", "MINUS", "MUL", "DIV", 
-                      "ID", "NUMBER", "STRING_LITERAL", "NEWLINE", "COMMENT", 
-                      "WS" ]
+                      "<INVALID>", "<INVALID>", "NOT", "AND", "OR", "LET", 
+                      "PRINT", "INPUT", "IF", "ELSE", "FOR", "TO", "NEXT", 
+                      "WHILE", "REPEAT", "UNTIL", "CONTINUE", "EXIT", "END", 
+                      "THEN", "MOD", "VAL", "LEN", "ISNAN", "REM", "DIM", 
+                      "REDIM", "FUN", "TYPE", "LT", "GT", "LE", "GE", "EQ", 
+                      "PLUS", "MINUS", "MUL", "DIV", "ID", "NUMBER", "STRING_LITERAL", 
+                      "NEWLINE", "COMMENT", "WS" ]
 
     RULE_program = 0
     RULE_statement = 1
@@ -181,50 +173,48 @@ class MiniBParser ( Parser ):
     T__2=3
     T__3=4
     T__4=5
-    T__5=6
-    T__6=7
-    NOT=8
-    AND=9
-    OR=10
-    LET=11
-    PRINT=12
-    INPUT=13
-    IF=14
-    ELSE=15
-    FOR=16
-    TO=17
-    NEXT=18
-    WHILE=19
-    REPEAT=20
-    UNTIL=21
-    CONTINUE=22
-    EXIT=23
-    END=24
-    THEN=25
-    MOD=26
-    VAL=27
-    LEN=28
-    ISNAN=29
-    REM=30
-    DIM=31
-    REDIM=32
-    DEF=33
-    TYPE=34
-    LT=35
-    GT=36
-    LE=37
-    GE=38
-    EQ=39
-    PLUS=40
-    MINUS=41
-    MUL=42
-    DIV=43
-    ID=44
-    NUMBER=45
-    STRING_LITERAL=46
-    NEWLINE=47
-    COMMENT=48
-    WS=49
+    NOT=6
+    AND=7
+    OR=8
+    LET=9
+    PRINT=10
+    INPUT=11
+    IF=12
+    ELSE=13
+    FOR=14
+    TO=15
+    NEXT=16
+    WHILE=17
+    REPEAT=18
+    UNTIL=19
+    CONTINUE=20
+    EXIT=21
+    END=22
+    THEN=23
+    MOD=24
+    VAL=25
+    LEN=26
+    ISNAN=27
+    REM=28
+    DIM=29
+    REDIM=30
+    FUN=31
+    TYPE=32
+    LT=33
+    GT=34
+    LE=35
+    GE=36
+    EQ=37
+    PLUS=38
+    MINUS=39
+    MUL=40
+    DIV=41
+    ID=42
+    NUMBER=43
+    STRING_LITERAL=44
+    NEWLINE=45
+    COMMENT=46
+    WS=47
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -293,7 +283,7 @@ class MiniBParser ( Parser ):
                         self.state = 46 
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
-                        if not (_la==47):
+                        if not (_la==45):
                             break
              
                 self.state = 52
@@ -303,7 +293,7 @@ class MiniBParser ( Parser ):
             self.state = 54
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 17607232681984) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 4401808170496) != 0):
                 self.state = 53
                 self.statement()
 
@@ -913,7 +903,7 @@ class MiniBParser ( Parser ):
             self.state = 109
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 17607232681984) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 4401808170496) != 0):
                 self.state = 104
                 localctx.statif = self.statement()
                 self.state = 105
@@ -925,7 +915,7 @@ class MiniBParser ( Parser ):
             self.state = 122
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==15:
+            if _la==13:
                 self.state = 112
                 self.match(MiniBParser.ELSE)
                 self.state = 113
@@ -933,7 +923,7 @@ class MiniBParser ( Parser ):
                 self.state = 119
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 17607232681984) != 0):
+                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 4401808170496) != 0):
                     self.state = 114
                     localctx.statelse = self.statement()
                     self.state = 115
@@ -1042,7 +1032,7 @@ class MiniBParser ( Parser ):
             self.state = 138
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 17607232681984) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 4401808170496) != 0):
                 self.state = 133
                 localctx.stat = self.statement()
                 self.state = 134
@@ -1131,7 +1121,7 @@ class MiniBParser ( Parser ):
             self.state = 151
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 17607232681984) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 4401808170496) != 0):
                 self.state = 146
                 localctx.stat = self.statement()
                 self.state = 147
@@ -1218,7 +1208,7 @@ class MiniBParser ( Parser ):
             self.state = 163
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 17607232681984) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 4401808170496) != 0):
                 self.state = 158
                 localctx.stat = self.statement()
                 self.state = 159
@@ -1298,13 +1288,13 @@ class MiniBParser ( Parser ):
             self.state = 171
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [22]:
+            if token in [20]:
                 localctx = MiniBParser.ContinueContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 169
                 self.match(MiniBParser.CONTINUE)
                 pass
-            elif token in [23]:
+            elif token in [21]:
                 localctx = MiniBParser.ExitContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
                 self.state = 170
@@ -1488,7 +1478,7 @@ class MiniBParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 185
             _la = self._input.LA(1)
-            if not(_la==9 or _la==10):
+            if not(_la==7 or _la==8):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
@@ -1545,7 +1535,7 @@ class MiniBParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 187
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 1065151889408) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 266287972352) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
@@ -1665,31 +1655,31 @@ class MiniBParser ( Parser ):
             self.state = 194
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [40]:
+            if token in [38]:
                 localctx = MiniBParser.PlusOperationContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 189
                 self.match(MiniBParser.PLUS)
                 pass
-            elif token in [41]:
+            elif token in [39]:
                 localctx = MiniBParser.MinusOperationContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
                 self.state = 190
                 self.match(MiniBParser.MINUS)
                 pass
-            elif token in [42]:
+            elif token in [40]:
                 localctx = MiniBParser.MulOperationContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
                 self.state = 191
                 self.match(MiniBParser.MUL)
                 pass
-            elif token in [43]:
+            elif token in [41]:
                 localctx = MiniBParser.DivOperationContext(self, localctx)
                 self.enterOuterAlt(localctx, 4)
                 self.state = 192
                 self.match(MiniBParser.DIV)
                 pass
-            elif token in [26]:
+            elif token in [24]:
                 localctx = MiniBParser.ModOperationContext(self, localctx)
                 self.enterOuterAlt(localctx, 5)
                 self.state = 193
@@ -2144,35 +2134,22 @@ class MiniBParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.FunctionDefStmtContext
             super().__init__(parser)
-            self.ftype = None # Token
             self.name = None # Token
-            self.ptypes = None # Token
             self.params = None # Token
-            self.stat = None # StatementContext
+            self.exp = None # ExpressionContext
             self.copyFrom(ctx)
 
-        def DEF(self):
-            return self.getToken(MiniBParser.DEF, 0)
-        def TYPE(self, i:int=None):
-            if i is None:
-                return self.getTokens(MiniBParser.TYPE)
-            else:
-                return self.getToken(MiniBParser.TYPE, i)
+        def FUN(self):
+            return self.getToken(MiniBParser.FUN, 0)
+        def EQ(self):
+            return self.getToken(MiniBParser.EQ, 0)
         def ID(self, i:int=None):
             if i is None:
                 return self.getTokens(MiniBParser.ID)
             else:
                 return self.getToken(MiniBParser.ID, i)
-        def NEWLINE(self, i:int=None):
-            if i is None:
-                return self.getTokens(MiniBParser.NEWLINE)
-            else:
-                return self.getToken(MiniBParser.NEWLINE, i)
-        def statement(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(MiniBParser.StatementContext)
-            else:
-                return self.getTypedRuleContext(MiniBParser.StatementContext,i)
+        def expression(self):
+            return self.getTypedRuleContext(MiniBParser.ExpressionContext,0)
 
 
         def accept(self, visitor:ParseTreeVisitor):
@@ -2192,64 +2169,31 @@ class MiniBParser ( Parser ):
             localctx = MiniBParser.FunctionDefContext(self, localctx)
             self.enterOuterAlt(localctx, 1)
             self.state = 234
-            self.match(MiniBParser.DEF)
+            self.match(MiniBParser.FUN)
             self.state = 235
-            localctx.ftype = self.match(MiniBParser.TYPE)
-            self.state = 236
             localctx.name = self.match(MiniBParser.ID)
-            self.state = 237
+            self.state = 236
             self.match(MiniBParser.T__2)
-            self.state = 248
+            self.state = 237
+            localctx.params = self.match(MiniBParser.ID)
+            self.state = 242
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==34:
+            while _la==5:
                 self.state = 238
-                localctx.ptypes = self.match(MiniBParser.TYPE)
+                self.match(MiniBParser.T__4)
                 self.state = 239
                 localctx.params = self.match(MiniBParser.ID)
-                self.state = 245
+                self.state = 244
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while _la==5:
-                    self.state = 240
-                    self.match(MiniBParser.T__4)
-                    self.state = 241
-                    localctx.ptypes = self.match(MiniBParser.TYPE)
-                    self.state = 242
-                    localctx.params = self.match(MiniBParser.ID)
-                    self.state = 247
-                    self._errHandler.sync(self)
-                    _la = self._input.LA(1)
 
-
-
-            self.state = 250
+            self.state = 245
             self.match(MiniBParser.T__3)
-            self.state = 251
-            self.match(MiniBParser.T__5)
-            self.state = 257
-            self._errHandler.sync(self)
-            _alt = self._interp.adaptivePredict(self._input,19,self._ctx)
-            while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
-                if _alt==1:
-                    self.state = 252
-                    localctx.stat = self.statement()
-                    self.state = 253
-                    self.match(MiniBParser.NEWLINE) 
-                self.state = 259
-                self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,19,self._ctx)
-
-            self.state = 261
-            self._errHandler.sync(self)
-            _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & 17607232681984) != 0):
-                self.state = 260
-                localctx.stat = self.statement()
-
-
-            self.state = 263
-            self.match(MiniBParser.T__6)
+            self.state = 246
+            self.match(MiniBParser.EQ)
+            self.state = 247
+            localctx.exp = self.expression(0)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2367,73 +2311,73 @@ class MiniBParser ( Parser ):
         self.enterRule(localctx, 40, self.RULE_functionCall)
         self._la = 0 # Token type
         try:
-            self.state = 293
+            self.state = 277
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [27]:
+            if token in [25]:
                 localctx = MiniBParser.ValFunctionContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 265
+                self.state = 249
                 self.match(MiniBParser.VAL)
-                self.state = 266
+                self.state = 250
                 self.match(MiniBParser.T__2)
-                self.state = 267
+                self.state = 251
                 localctx.expr = self.expression(0)
-                self.state = 268
+                self.state = 252
                 self.match(MiniBParser.T__3)
                 pass
-            elif token in [28]:
+            elif token in [26]:
                 localctx = MiniBParser.LenFunctionContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 270
+                self.state = 254
                 self.match(MiniBParser.LEN)
-                self.state = 271
+                self.state = 255
                 self.match(MiniBParser.T__2)
-                self.state = 272
+                self.state = 256
                 localctx.expr = self.expression(0)
-                self.state = 273
+                self.state = 257
                 self.match(MiniBParser.T__3)
                 pass
-            elif token in [29]:
+            elif token in [27]:
                 localctx = MiniBParser.IsNanFunctionContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
-                self.state = 275
+                self.state = 259
                 self.match(MiniBParser.ISNAN)
-                self.state = 276
+                self.state = 260
                 self.match(MiniBParser.T__2)
-                self.state = 277
+                self.state = 261
                 localctx.expr = self.expression(0)
-                self.state = 278
+                self.state = 262
                 self.match(MiniBParser.T__3)
                 pass
-            elif token in [44]:
+            elif token in [42]:
                 localctx = MiniBParser.GenericFunctionContext(self, localctx)
                 self.enterOuterAlt(localctx, 4)
-                self.state = 280
+                self.state = 264
                 localctx.name = self.match(MiniBParser.ID)
-                self.state = 281
+                self.state = 265
                 self.match(MiniBParser.T__2)
-                self.state = 290
+                self.state = 274
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & 123146241835016) != 0):
-                    self.state = 282
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & 30786560458760) != 0):
+                    self.state = 266
                     localctx.expr = self.expression(0)
-                    self.state = 287
+                    self.state = 271
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
                     while _la==5:
-                        self.state = 283
+                        self.state = 267
                         self.match(MiniBParser.T__4)
-                        self.state = 284
+                        self.state = 268
                         localctx.expr = self.expression(0)
-                        self.state = 289
+                        self.state = 273
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
 
 
 
-                self.state = 292
+                self.state = 276
                 self.match(MiniBParser.T__3)
                 pass
             else:

@@ -90,11 +90,7 @@ expression: left=expression op=arithmeticOp right=expression #ArithmeticExpressi
             | ID '[' expr=expression ']' #ArrayAccessExpression
             ;
 
-functionDefStmt: DEF ftype=TYPE name=ID '(' (ptypes=TYPE params=ID (','ptypes=TYPE params=ID)*)? ')'
-            '{'
-                 (stat=statement NEWLINE)* stat=statement?
-            '}' #FunctionDef
-            ;
+functionDefStmt: FUN name=ID '(' params=ID (',' params=ID)* ')' '=' exp=expression #FunctionDef;
 
 functionCall: VAL '(' expr=expression ')'   #ValFunction
             | LEN '(' expr=expression ')'   #LenFunction
@@ -128,8 +124,8 @@ ISNAN:      'ISNAN' | 'isnan' ;
 REM:        'REM' | 'rem' ;
 DIM:        'DIM' | 'dim' ;
 REDIM:      'REDIM' | 'redim' ;
-DEF:        'DEF' | 'def' ;
-TYPE:       'INT' | 'int' | 'FLOAT' | 'float' | 'STRING' | 'string' | 'LIST' | 'list' | 'BOOLEAN' | 'boolean' ;
+FUN:        'FUN' | 'fun' ;
+TYPE:       'INT' | 'int' | 'FLOAT' | 'float' | 'STR' | 'str' | 'LIST' | 'list' | 'BOOLEAN' | 'boolean' ;
 
 LT:         '<' ;
 GT:         '>' ;

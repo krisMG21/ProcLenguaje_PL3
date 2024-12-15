@@ -62,5 +62,3 @@ class SymbolTable:
         Devuelve una representación de la tabla de símbolos.
         """
         return str(self.symbols)
-
-
