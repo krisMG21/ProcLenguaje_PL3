@@ -457,9 +457,9 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f"ldc {val0}")  # Cargar el valor convertido
                 self.store_var(var_index_0, val0)  # Guardar el valor convertido
             except ValueError:
-                raise TypeError(
-                    f"Operación no válida: no se puede convertir '{val0}' a número."
-                )
+                val1 = f'"{val1}"'
+                return self.concat(val0, str(val1))
+
         elif isinstance(val1, str) and not isinstance(val0, str):
             try:
                 raw_val1 = val1.strip('"')  # Elimina las comillas externas
@@ -471,9 +471,9 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f"ldc {val1}")  # Cargar el valor convertido
                 self.store_var(var_index_1, val1)  # Guardar el valor convertido
             except ValueError:
-                raise TypeError(
-                    f"Operación no válida: no se puede convertir '{val1}' a número."
-                )
+                # Transformar el valor que no es string a string y concatenarlos
+                val0 = f'"{val0}"'
+                return self.concat(str(val0), val1)
         elif isinstance(val0, str) and isinstance(val1, str):
             return self.concat(val0, val1)
 
