@@ -230,7 +230,6 @@ class Visitor(ParseTreeVisitor):
         else:
             # Caso normal
             self.try_ID(ctx.exp, value)
-
             # Asignar printtype según el valor
             match value:
                 case int():
@@ -387,7 +386,6 @@ class Visitor(ParseTreeVisitor):
         self.add_instruction(f"goto FOR_END_{self.index_for[-1]}")
 
     def visitComparison(self, ctx: MiniBParser.ComparisonContext):
-        print("En comparison")
         val0 = self.visit(
             ctx.left
         )  # Carga el lado izquierdo de la comparación en la pila
@@ -640,18 +638,15 @@ class Visitor(ParseTreeVisitor):
     def visitValFunction(self, ctx: MiniBParser.ValFunctionContext):
         value = self.visit(ctx.expr)
 
-        self.add_function(VAL)
-
-        self.try_ID(ctx.expr, value)
-        self.add_instruction(
-            "invokestatic MiniB/val(Ljava/lang/String;)Ljava/lang/Integer;"
-        )
-
-        try:
-            value = int(value)
-        except Exception:
+        try: 
+            value = int(value[1:-1])
+            self.try_ID(ctx.expr, value)
+        except:
             value = None
-            # print("En VAL() no se ha podido convertir el valor")
+            self.add_instruction(f"aconst_null")
+        
+        # 
+
         return value
 
     def visitLenFunction(self, ctx: MiniBParser.LenFunctionContext):
@@ -672,9 +667,9 @@ class Visitor(ParseTreeVisitor):
         self.add_function(ISNAN)
 
         self.try_ID(ctx.expr, value)
-        self.add_instruction("invokestatic MiniB/len(Ljava/lang/Object;)I")
-
-        return 0
+        #self.add_instruction("invokestatic MiniB/len(Ljava/lang/Object;)I")
+        
+        return value
 
     def visitDim(self, ctx: MiniBParser.DimContext):
         """

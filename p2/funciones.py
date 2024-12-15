@@ -57,7 +57,7 @@ loop:
 
 checkSpace:
     iload 5
-    ifne .continue     ; If we found a digit, continue collecting
+    ifne continue     ; If we found a digit, continue collecting
     iload 2
     bipush 32         ; ' '
     if_icmpeq skip   ; If it's a space, skip it
@@ -85,12 +85,13 @@ done:
 
     ; Return the number as Integer
     getstatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;
-    areturn
+    goto end
 
 
 returnNull:
     aconst_null
-    areturn
+    return
+end:
 
 .end method    """
 LEN = """.method public static len(Ljava/lang/String;)I
