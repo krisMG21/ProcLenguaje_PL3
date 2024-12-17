@@ -2135,6 +2135,7 @@ class MiniBParser ( Parser ):
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.FunctionDefStmtContext
             super().__init__(parser)
             self.name = None # Token
+            self.param1 = None # Token
             self.params = None # Token
             self.exp = None # ExpressionContext
             self.copyFrom(ctx)
@@ -2175,7 +2176,7 @@ class MiniBParser ( Parser ):
             self.state = 236
             self.match(MiniBParser.T__2)
             self.state = 237
-            localctx.params = self.match(MiniBParser.ID)
+            localctx.param1 = self.match(MiniBParser.ID)
             self.state = 242
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -2265,7 +2266,8 @@ class MiniBParser ( Parser ):
         def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniBParser.FunctionCallContext
             super().__init__(parser)
             self.name = None # Token
-            self.expr = None # ExpressionContext
+            self.expr1 = None # ExpressionContext
+            self.exprn = None # ExpressionContext
             self.copyFrom(ctx)
 
         def ID(self):
@@ -2362,7 +2364,7 @@ class MiniBParser ( Parser ):
                 _la = self._input.LA(1)
                 if (((_la) & ~0x3f) == 0 and ((1 << _la) & 30786560458760) != 0):
                     self.state = 266
-                    localctx.expr = self.expression(0)
+                    localctx.expr1 = self.expression(0)
                     self.state = 271
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
@@ -2370,7 +2372,7 @@ class MiniBParser ( Parser ):
                         self.state = 267
                         self.match(MiniBParser.T__4)
                         self.state = 268
-                        localctx.expr = self.expression(0)
+                        localctx.exprn = self.expression(0)
                         self.state = 273
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)

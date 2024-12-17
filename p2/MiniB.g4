@@ -90,12 +90,12 @@ expression: left=expression op=arithmeticOp right=expression #ArithmeticExpressi
             | ID '[' expr=expression ']' #ArrayAccessExpression
             ;
 
-functionDefStmt: FUN name=ID '(' params=ID (',' params=ID)* ')' '=' exp=expression #FunctionDef;
+functionDefStmt: FUN name=ID '(' param1=ID (',' params=ID)* ')' '=' exp=expression #FunctionDef;
 
 functionCall: VAL '(' expr=expression ')'   #ValFunction
             | LEN '(' expr=expression ')'   #LenFunction
             | ISNAN '(' expr=expression ')' #IsNanFunction
-            | name=ID '(' (expr=expression (',' expr=expression)*)? ')' #GenericFunction
+            | name=ID '(' (expr1=expression (',' exprn=expression)*)? ')' #GenericFunction
             ;
 
 // LEXER RULES

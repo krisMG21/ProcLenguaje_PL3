@@ -77,7 +77,10 @@ class Visitor(ParseTreeVisitor):
         Agrega una instrucción a la lista de instrucciones.
         Estas se agregan al archivo final entre header y footer.
         """
-        self.instructions.append(f"    {instruction}")
+        if self.state == "function":
+            self.add_function(instruction)
+        else:
+            self.instructions.append(f"    {instruction}")
 
     def store_var(self, var_index, var_value):
         """
@@ -457,9 +460,9 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f"ldc {val0}")  # Cargar el valor convertido
                 self.store_var(var_index_0, val0)  # Guardar el valor convertido
             except ValueError:
-                val1 = f'"{val1}"'
-                return self.concat(val0, str(val1))
-
+                raise TypeError(
+                    f"Operación no válida: no se puede convertir '{val0}' a número."
+                )
         elif isinstance(val1, str) and not isinstance(val0, str):
             try:
                 raw_val1 = val1.strip('"')  # Elimina las comillas externas
@@ -471,9 +474,9 @@ class Visitor(ParseTreeVisitor):
                 self.add_instruction(f"ldc {val1}")  # Cargar el valor convertido
                 self.store_var(var_index_1, val1)  # Guardar el valor convertido
             except ValueError:
-                # Transformar el valor que no es string a string y concatenarlos
-                val0 = f'"{val0}"'
-                return self.concat(str(val0), val1)
+                raise TypeError(
+                    f"Operación no válida: no se puede convertir '{val1}' a número."
+                )
         elif isinstance(val0, str) and isinstance(val1, str):
             return self.concat(val0, val1)
 
@@ -593,59 +596,84 @@ class Visitor(ParseTreeVisitor):
 
     def visitFunctionDef(self, ctx: MiniBParser.FunctionDefContext):
         # Extract function name and parameters
+        self.state = "function"
         function_name = ctx.name.text
+        self.function_defs[function_name] = ""
+        param1 = ctx.param1.text
         params = ctx.params.text.split(",") if ctx.params else []
+        params = [param1] + params
+
         param_count = len(params)
 
-        # Visit the expression (function body)
-        function_body = self.visit(ctx.exp)
+        print(f"Params: {params}")
 
-        jasmin_code = f"""
+        # Visit the expression (function body)
+        self.add_function(f"""
 .method public static {function_name}({'I' * param_count})I
     .limit stack 10
     .limit locals {param_count + 1}
 
     ; Load parameters into local variables
-"""
+""")
         for i, param in enumerate(params):
-            jasmin_code += f"    iload_{i} ; Load parameter {param}\n"
+            print(f"Añadida variable {param} a tabla de símbolos")
+            self.tabla.add(param, 0)
 
-        jasmin_code += f"""
-    ; Function body
-        {function_body}
-
-    ireturn
-.end method
-    """
-        # Add the function to the list of defined functions
-        self.add_function(jasmin_code)
+        self.add_instruction("\n; Function body")
+        self.visit(ctx.exp)
+        self.add_instruction("\n    ireturn\n.end method\n")
+        self.state = "main"
 
     def visitGenericFunction(self, ctx: MiniBParser.GenericFunctionContext):
-        # Extract function name and arguments
         function_name = ctx.name.text
-        arguments = ctx.expr
+        param_count = 0
 
-        # Visit each argument and push it onto the stack
-        for arg in arguments:
-            self.visit(arg)
+        # Visit each argument expression and push it onto the stack
+        try:
+            value = self.visit(ctx.expr1)
+            print(f"Valor: {value}")
+            self.try_ID(ctx.expr1, value)
+            param_count += 1
+
+        except AttributeError:
+            pass
+
+        try:
+            value = self.visit(ctx.exprn)
+            print(f"Valor: {value}")
+            self.try_ID(ctx.exprn, value)
+            param_count += 1
+        except AttributeError:
+            for expr in ctx.exprn.getChildren():
+                value = self.visit(expr)
+                print(f"Valor: {value}")
+                self.try_ID(expr, value)
+                param_count += 1
+
+        # Check if the function is defined
+
+        if function_name not in self.function_defs:
+            raise ValueError(f"Function {function_name} is not defined")
 
         # Generate Jasmin code to call the function
-        param_count = len(arguments)
+
         self.add_instruction(
             f"invokestatic MiniB/{function_name}({'I' * param_count})I"
         )
 
+        return 0
+
     def visitValFunction(self, ctx: MiniBParser.ValFunctionContext):
         value = self.visit(ctx.expr)
 
-        try: 
+        try:
             value = int(value[1:-1])
             self.try_ID(ctx.expr, value)
         except:
             value = None
             self.add_instruction(f"aconst_null")
-        
-        # 
+
+        #
 
         return value
 
@@ -667,37 +695,8 @@ class Visitor(ParseTreeVisitor):
         self.add_function(ISNAN)
 
         self.try_ID(ctx.expr, value)
-        #self.add_instruction("invokestatic MiniB/len(Ljava/lang/Object;)I")
-        
-        return value
+        # self.add_instruction("invokestatic MiniB/len(Ljava/lang/Object;)I")
 
-    def visitDim(self, ctx: MiniBParser.DimContext):
-        """
-        Define una variable de tipo array.
-        Ejemplo:
-        DIM numbers[3]
-
-        Pasos:
-        1. Calcular el tamaño del array visitando ctx.exp
-        2. Crear el array con 'newarray int'
-        3. Guardar en la tabla de símbolos y almacenar en locals con 'astore_x'
-        """
-        var_name = ctx.ID().getText()  # Nombre de la variable
-        size = self.visit(ctx.exp)  # Calcula la dimensión del array
-
-        # Cargar el tamaño en la pila
-        self.add_instruction(f"ldc {size}")
-
-        # Crear un array de enteros
-        self.add_instruction("newarray int")
-
-        try:
-            # Añadir la variable a la tabla de símbolos
-            var_index = self.tabla.add(var_name, size)
-        except KeyError as e:
-            print(f"Error al agregar variable a la tabla de símbolos: {e}")
-            self.error = True
-            return
 
         # Guardar la referencia del array en un local
         self.add_instruction(f"astore_{var_index}")
